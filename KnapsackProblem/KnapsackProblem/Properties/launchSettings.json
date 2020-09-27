@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KnapsackProblem": {
+      "commandName": "Project",
+      "commandLineArgs": "-i somInput -p decisionversion"
+    }
+  }
+}
