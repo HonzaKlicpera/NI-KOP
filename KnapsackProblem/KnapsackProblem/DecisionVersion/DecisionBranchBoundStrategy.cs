@@ -6,26 +6,32 @@ using System.Linq;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    public class DecisionBranchBoundStrategy : IDecisionStrategy
+    public class DecisionBranchBoundStrategy : DecisionStrategy
     {
-        public bool DoesSolutionExist(DecisionKnapsackInstance decisionVersion)
+        public override bool DoesSolutionExist(DecisionKnapsackInstance knapSackInstance)
         {
-            return DoesSolutionExist(decisionVersion.Items.Count, 0, 0, decisionVersion.GetPriceOfAllItems(), decisionVersion);
+            NumberOfSteps = 0;
+
+            return DoesSolutionExist(knapSackInstance.Items.Count, 0, 0, knapSackInstance.GetPriceOfAllItems(), knapSackInstance);
         }
 
         bool DoesSolutionExist(int itemsRemaining, int currentPrice, 
-            int currentWeight, int maxRemainingPrice, DecisionKnapsackInstance decisionVersion)
+            int currentWeight, int maxRemainingPrice, DecisionKnapsackInstance knapsackInstance)
         {
-            if (currentPrice + maxRemainingPrice < decisionVersion.MinimalPrice)
+            NumberOfSteps++;
+
+            if (currentWeight > knapsackInstance.KnapsackSize)
+                return false;
+            if (currentPrice + maxRemainingPrice < knapsackInstance.MinimalPrice)
                 return false;
 
             if (itemsRemaining == 0)
-                return currentWeight <= decisionVersion.KnapsackSize && currentPrice >= decisionVersion.MinimalPrice;
+                return currentWeight <= knapsackInstance.KnapsackSize && currentPrice >= knapsackInstance.MinimalPrice;
 
-            KnapsackItem currentItem = decisionVersion.Items[itemsRemaining - 1];
-            if (DoesSolutionExist(itemsRemaining - 1, currentPrice + currentItem.Price, currentWeight + currentItem.Weight, maxRemainingPrice, decisionVersion))
+            KnapsackItem currentItem = knapsackInstance.Items[itemsRemaining - 1];
+            if (DoesSolutionExist(itemsRemaining - 1, currentPrice + currentItem.Price, currentWeight + currentItem.Weight, maxRemainingPrice, knapsackInstance))
                 return true;
-            if (DoesSolutionExist(itemsRemaining - 1, currentPrice, currentWeight, maxRemainingPrice - currentItem.Price, decisionVersion))
+            if (DoesSolutionExist(itemsRemaining - 1, currentPrice, currentWeight, maxRemainingPrice - currentItem.Price, knapsackInstance))
                 return true;
             return false;
         }

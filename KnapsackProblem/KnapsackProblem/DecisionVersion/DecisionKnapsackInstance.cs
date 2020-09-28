@@ -18,11 +18,6 @@ namespace KnapsackProblem.DecisionVersion
             ParseInputLine(inputLine);
         }
 
-        public bool DoesSolutionExist(IDecisionStrategy solutionStrategy)
-        {
-            return solutionStrategy.DoesSolutionExist(this);
-        }
-
         void ParseInputLine(string inputLine)
         {
             var inputFields = inputLine.Split(' ');

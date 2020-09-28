@@ -5,22 +5,22 @@ using KnapsackProblem.Common;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    public class DecisionBruteForceStrategy : IDecisionStrategy
+    public class DecisionBruteForceStrategy : DecisionStrategy
     {
-        public bool DoesSolutionExist(DecisionKnapsackInstance decisionVersion)
+        public override bool DoesSolutionExist(DecisionKnapsackInstance knapsackInstance)
         {
-            return DoesSolutionExist(decisionVersion.Items.Count, 0, 0, decisionVersion);
+            return DoesSolutionExist(knapsackInstance.Items.Count, 0, 0, knapsackInstance);
         }
 
-        bool DoesSolutionExist(int itemsRemaining, int currentPrice, int currentWeight, DecisionKnapsackInstance decisionVersion)
+        bool DoesSolutionExist(int itemsRemaining, int currentPrice, int currentWeight, DecisionKnapsackInstance knapsackInstance)
         {
             if (itemsRemaining == 0)
-                return currentWeight <= decisionVersion.KnapsackSize && currentPrice >= decisionVersion.MinimalPrice;
+                return currentWeight <= knapsackInstance.KnapsackSize && currentPrice >= knapsackInstance.MinimalPrice;
 
-            KnapsackItem currentItem = decisionVersion.Items[itemsRemaining - 1];
-            if (DoesSolutionExist(itemsRemaining - 1, currentPrice + currentItem.Price, currentWeight + currentItem.Weight, decisionVersion))
+            KnapsackItem currentItem = knapsackInstance.Items[itemsRemaining - 1];
+            if (DoesSolutionExist(itemsRemaining - 1, currentPrice + currentItem.Price, currentWeight + currentItem.Weight, knapsackInstance))
                 return true;
-            if (DoesSolutionExist(itemsRemaining - 1, currentPrice, currentWeight, decisionVersion))
+            if (DoesSolutionExist(itemsRemaining - 1, currentPrice, currentWeight, knapsackInstance))
                 return true;
             return false;
         }
