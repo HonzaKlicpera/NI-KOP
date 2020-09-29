@@ -8,17 +8,19 @@ namespace KnapsackProblem.DecisionVersion
 {
     public class DecisionBranchBoundStrategy : DecisionStrategy
     {
-        public override bool DoesSolutionExist(DecisionKnapsackInstance knapSackInstance)
+        public override DecisionSolution Solve(DecisionKnapsackInstance knapsackInstance)
         {
-            NumberOfSteps = 0;
+            numberOfSteps = 0;
 
-            return DoesSolutionExist(knapSackInstance.Items.Count, 0, 0, knapSackInstance.GetPriceOfAllItems(), knapSackInstance);
+            bool permutationExists =  DoesSolutionExist(knapsackInstance.Items.Count, 0, 0, knapsackInstance.GetPriceOfAllItems(), knapsackInstance);
+
+            return new DecisionSolution { KnapsackInstance = knapsackInstance, NumberOfSteps = numberOfSteps, PermutationExists = permutationExists };
         }
 
         bool DoesSolutionExist(int itemsRemaining, int currentPrice, 
             int currentWeight, int maxRemainingPrice, DecisionKnapsackInstance knapsackInstance)
         {
-            NumberOfSteps++;
+            numberOfSteps++;
 
             if (currentWeight > knapsackInstance.KnapsackSize)
                 return false;

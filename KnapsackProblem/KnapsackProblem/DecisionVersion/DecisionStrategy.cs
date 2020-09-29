@@ -6,8 +6,19 @@ namespace KnapsackProblem.DecisionVersion
 {
     public abstract class DecisionStrategy
     {
-        public int NumberOfSteps { get; protected set; }
+        protected int numberOfSteps;
 
-        public abstract bool DoesSolutionExist(DecisionKnapsackInstance decisionVersion);
+        public abstract DecisionSolution Solve(DecisionKnapsackInstance instance);
+
+        public IList<DecisionSolution> SolveAll(IList<DecisionKnapsackInstance> instances)
+        {
+            var solutions = new List<DecisionSolution>();
+            foreach (var instance in instances)
+            {
+                solutions.Add(Solve(instance));
+            }
+
+            return solutions;
+        }
     }
 }
