@@ -2,7 +2,7 @@
   "profiles": {
     "KnapsackProblem": {
       "commandName": "Project",
-      "commandLineArgs": "-i somInput -p decisionversion"
+      "commandLineArgs": "-i C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW1\\\\NR\\\\NR10_inst.dat -p decision -t C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW1\\\\NR\\\\NK10_sol.dat -s bruteforce -o C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW1\\\\test.csv"
     }
   }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
+using System.Linq;
 using KnapsackProblem.Common;
+using KnapsackProblem.DecisionVersion;
 
 namespace KnapsackProblem.Helpers
 {
@@ -36,6 +39,47 @@ namespace KnapsackProblem.Helpers
                 throw new InvalidInputFormatException($"{fieldName} is negative");
 
             return value;
+        }
+
+        public static DecisionKnapsackInstance ParseDecisionKnapsackInstance(string inputLine)
+        {
+            var inputFields = inputLine.Split(' ');
+
+            var id = -ParseIntField(inputFields[0], "Id");
+            var knapsackSize = ParseNonNegativeIntField(inputFields[2], "Knapsack size");
+            var minimalPrice = ParseNonNegativeIntField(inputFields[3], "Minimal price");
+            var items = ParseItems(inputFields.Skip(4).ToArray());
+
+            return new DecisionKnapsackInstance { Id = id, KnapsackSize = knapsackSize, MinimalPrice = minimalPrice, Items = items };
+        }
+
+        public static KnapsackReferenceSolution ParseSolution(string inputLine)
+        {
+            var inputFields = inputLine.Split(' ');
+
+            int id = ParseNonNegativeIntField(inputFields[0], "Id");
+            int price = ParseNonNegativeIntField(inputFields[2], "Price");
+
+            var solutionVector = ParseSolutionVector(inputFields.Skip(3).ToArray());
+
+            return new KnapsackReferenceSolution { Id = id, Price = price, SolutionVector = solutionVector };
+        }
+
+        public static List<bool> ParseSolutionVector(string[] fields)
+        {
+            var solutionVector = new List<bool>();
+
+            foreach (var f in fields)
+            {
+                if (f == "1")
+                    solutionVector.Add(true);
+                else if (f == "0")
+                    solutionVector.Add(false);
+                else if (f != "")
+                    throw new InvalidInputFormatException("The solution vector can be defined only using 0/1 values");
+            }
+
+            return solutionVector;
         }
 
         public static IList<KnapsackItem> ParseItems(string[] fields)
