@@ -33,6 +33,7 @@ namespace KnapsackProblem.Helpers
                 csv.Configuration.RegisterClassMap<SingleResultMap>();
                 csv.Configuration.HasHeaderRecord = !fileExists;
                 csv.WriteRecords(solutions);
+                csv.Flush();
             }
         }
 

@@ -22,6 +22,8 @@ namespace KnapsackProblem
                         var strategy = GetDecisionStrategy(o.Strategy);
                         var instances = ReadDecisionKnapsackInstances(o.InputFile);
 
+                        Console.WriteLine($"Opening file {o.InputFile}");
+
                         var solutions = strategy.SolveAll(instances);
 
                         if(o.ReferenceFile != null)
@@ -96,6 +98,10 @@ namespace KnapsackProblem
                 return new DecisionBruteForceStrategy();
             else if (strategyField.Equals("BranchAndBound", StringComparison.OrdinalIgnoreCase))
                 return new DecisionBranchBoundStrategy();
+            else if (strategyField.Equals("BranchAndBoundPriceAsc", StringComparison.OrdinalIgnoreCase))
+                return new DecisionPriceAscBranchBoundStrategy();
+            else if (strategyField.Equals("BranchAndBoundWeightAsc", StringComparison.OrdinalIgnoreCase))
+                return new DecisionWeightAscBranchBoundStrategy();
             throw new InvalidArgumentException($"{strategyField} is not a valid strategy for decision version");
         }
 
@@ -117,7 +123,7 @@ namespace KnapsackProblem
 
         static void WriteResults(IList<DecisionSolution> solutions, string location)
         {
-            int acc = 0;
+            ulong acc = 0;
             foreach(var s in solutions)
             {
                 Console.WriteLine($"Id:{s.KnapsackInstance.Id}, Number of steps:{s.NumberOfSteps}, result: {s.PermutationExists}");

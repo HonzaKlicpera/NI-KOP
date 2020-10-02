@@ -6,7 +6,7 @@ namespace KnapsackProblem.DecisionVersion
 {
     public class DecisionSolution
     {
-        public int NumberOfSteps { get; set; }
+        public ulong NumberOfSteps { get; set; }
 
         public bool PermutationExists { get; set; }
 

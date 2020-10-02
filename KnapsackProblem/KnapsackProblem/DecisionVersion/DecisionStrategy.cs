@@ -6,7 +6,7 @@ namespace KnapsackProblem.DecisionVersion
 {
     public abstract class DecisionStrategy
     {
-        protected int numberOfSteps;
+        protected ulong numberOfSteps;
 
         public abstract DecisionSolution Solve(DecisionKnapsackInstance instance);
 
@@ -15,6 +15,7 @@ namespace KnapsackProblem.DecisionVersion
             var solutions = new List<DecisionSolution>();
             foreach (var instance in instances)
             {
+                Console.WriteLine($"Processing instance no. {instance.Id}");
                 solutions.Add(Solve(instance));
             }
 
