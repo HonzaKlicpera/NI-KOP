@@ -10,13 +10,16 @@ namespace KnapsackProblem.DecisionVersion
 
         public abstract DecisionSolution Solve(DecisionKnapsackInstance instance);
 
-        public IList<DecisionSolution> SolveAll(IList<DecisionKnapsackInstance> instances)
+        public IList<DecisionSolution> SolveAll(IList<DecisionKnapsackInstance> instances, string strategy, string dataSetName)
         {
             var solutions = new List<DecisionSolution>();
             foreach (var instance in instances)
             {
                 Console.WriteLine($"Processing instance no. {instance.Id}");
-                solutions.Add(Solve(instance));
+                var solution = Solve(instance);
+                solution.Strategy = strategy;
+                solution.DataSetName = dataSetName;
+                solutions.Add(solution);
             }
 
             return solutions;

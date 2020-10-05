@@ -17,6 +17,9 @@ namespace KnapsackProblem.Helpers
             Map(m => m.NumberOfSteps).Name("Number of steps");
             Map(m => m.PermutationExists).Name("Result");
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
+            Map(m => m.Strategy).Name("Strategy");
+            Map(m => m.DataSetName).Name("Data set name");
+
         }
     }
     public static class OutputWriter

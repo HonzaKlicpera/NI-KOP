@@ -10,6 +10,10 @@ namespace KnapsackProblem.DecisionVersion
 
         public bool PermutationExists { get; set; }
 
+        public string Strategy { get; set; }
+
+        public string DataSetName { get; set; }
+
         public DecisionKnapsackInstance KnapsackInstance { get; set; }
     }
 }

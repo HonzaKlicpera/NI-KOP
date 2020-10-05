@@ -1,0 +1,35 @@
+$workfolder = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1"
+$strategies = "BranchAndBound","BranchAndBoundSorted"
+$datasets = "N","Z"
+$datasets | ForEach-Object -Process {
+	$dataset = $_
+	$strategies | ForEach-Object -Process {
+		$dataFiles = "$workfolder"+"\\"+"$dataset"+"R\\*_inst.dat"
+		$outputFolder = "$workfolder"+"\\results.csv"
+		$strategy = $_
+		Get-ChildItem "$dataFiles" -Name | ForEach-Object -Process {
+			$testFile = "$_" -replace "[^0-9]";
+			$testFile = $dataset+"K"+$testFile+"_sol.dat"
+			$input = "$workfolder"+"\\"+$dataset+"R\\"+"$_"
+			$testfile = "$workfolder"+"\\"+$dataset+"R\\"+$testFile
+			./KnapsackProblem.exe -i "$input" -p decision -t "$testFile" -s $strategy -o "$outputFolder" --setname=$dataset
+			echo $testFile;
+		}
+	}
+}
+
+
+$strategies = "BranchAndBoundSorted"
+$strategies | ForEach-Object -Process {
+	$dataFolder = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1\\ZR\\*_inst.dat"
+	$outputFolder = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1\\ZR\\"+$_+".csv"
+	$strategy = $_
+	Get-ChildItem "$dataFolder" -Name | ForEach-Object -Process {
+		$testFile = "$_" -replace "[^0-9]";
+		$testFile = "ZK"+$testFile+"_sol.dat"
+		$input = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1\\ZR\\"+"$_"
+		$testfile = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1\\ZR\\"+$testFile
+		./KnapsackProblem.exe -i "$input" -p decision -t "$testFile" -s $strategy -o "$outputFolder"
+		echo $testFile;
+	}
+}

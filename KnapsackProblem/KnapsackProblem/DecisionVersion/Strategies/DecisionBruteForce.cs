@@ -5,7 +5,7 @@ using KnapsackProblem.Common;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    public class DecisionBruteForceStrategy : DecisionStrategy
+    public class DecisionBruteForce : DecisionStrategy
     {
         public override DecisionSolution Solve(DecisionKnapsackInstance knapsackInstance)
         {

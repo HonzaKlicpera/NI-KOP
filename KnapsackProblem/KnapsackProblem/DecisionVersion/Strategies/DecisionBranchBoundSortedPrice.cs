@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    class DecisionWeightAscBranchBoundStrategy: DecisionStrategy
+    public class DecisionBranchBoundSortedPrice : DecisionStrategy
     {
         public override DecisionSolution Solve(DecisionKnapsackInstance instance)
         {
-            instance.Items = instance.Items.OrderBy(a => a.Weight).ToList();
+            instance.Items = instance.Items.OrderBy(a => a.Price).ToList();
 
-            return new DecisionBranchBoundStrategy().Solve(instance);
+            return new DecisionBranchBound().Solve(instance);
         }
     }
 }

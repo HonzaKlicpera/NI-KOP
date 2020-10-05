@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    public class DecisionBranchBoundStrategy : DecisionStrategy
+    public class DecisionBranchBound : DecisionStrategy
     {
         public override DecisionSolution Solve(DecisionKnapsackInstance knapsackInstance)
         {

@@ -5,14 +5,10 @@ using System.Text;
 using System.Linq;
 using KnapsackProblem.Common;
 using KnapsackProblem.DecisionVersion;
+using KnapsackProblem.Exceptions;
 
 namespace KnapsackProblem.Helpers
 {
-    class InvalidInputFormatException : Exception
-    {
-        public InvalidInputFormatException() { }
-        public InvalidInputFormatException(string message) : base(message) { }
-    }
 
     public static class InputFieldParser
     {

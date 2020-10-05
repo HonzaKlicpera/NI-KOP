@@ -14,143 +14,109 @@ namespace KnapsackProblem
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<CommandLineOptions>(args).WithParsed(
-                o =>
-                {
-                    if (o.ProblemVersion.Equals("decision", StringComparison.OrdinalIgnoreCase)
-                        || o.ProblemVersion.Equals("d", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var strategy = GetDecisionStrategy(o.Strategy);
-                        var instances = ReadDecisionKnapsackInstances(o.InputFile);
-
-                        Console.WriteLine($"Opening file {o.InputFile}");
-
-                        var solutions = strategy.SolveAll(instances);
-
-                        if(o.ReferenceFile != null)
-                        {
-                            Console.WriteLine("Validating the results...");
-                            var referenceSolutions = ReadReferenceSolutions(o.ReferenceFile);
-                            ValidateSolutions(solutions, referenceSolutions);
-                        }
-                        //TODO: properly check whether to write into file or console
-                        //WriteResults(solutions, o.OutputFile);
-                        OutputWriter.WriteAllResults(solutions, o.OutputFile);
-                    }
-                });
-
-            /*
-            bool checkValidity = true;
-            Dictionary<int, int> correctAnswers = new Dictionary<int, int>();
-            IDecisionKnapsackStrategy strategy = new DecisionBruteForceStrategy();
-
-            if (checkValidity)
-            {
-                correctAnswers = ParseCorrectAnswers("C:\\Downloads\\NR\\NK20_sol.dat");
-            }
-            using (StreamReader file = new StreamReader("C:\\Downloads\\NR\\NR20_inst.dat"))
-            {
-                string ln;
-
-                while ((ln = file.ReadLine()) != null)
-                {
-                    var dec = new DecisionKnapsackInstance(ln);
-                    var result = dec.DoesSolutionExist(strategy);
-                    Console.WriteLine(dec.Id + " " + result);
-
-                    if (checkValidity)
-                    {
-                        if (dec.MinimalPrice <= correctAnswers[dec.Id] == result)
-                            Console.WriteLine("All good!");
-                        else
-                            Console.WriteLine("noooooo");
-                    }
-                }
-                
-            }
-            */
+                o => ProcessArguments(o));
         }
 
-        //TODO: Move methods into proper class
-        static void ValidateSolutions(IList<DecisionSolution> solutions, Dictionary<int, KnapsackReferenceSolution> referenceSolutions)
+        static void ProcessArguments(CommandLineOptions options)
         {
-            bool allCorrect = true;
-            foreach (var s in solutions)
+            try
             {
-                var referenceSolution = referenceSolutions[s.KnapsackInstance.Id];
-                var shouldPermutationExist = referenceSolution.Price >= s.KnapsackInstance.MinimalPrice;
-
-                if (s.PermutationExists != shouldPermutationExist)
+                if (options.ProblemVersion.Equals("decision", StringComparison.OrdinalIgnoreCase)
+                    || options.ProblemVersion.Equals("d", StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine($"Permutation instance solution (id {s.KnapsackInstance.Id}) incorrect," +
-                        $" result: {s.PermutationExists}, expected result: {shouldPermutationExist}");
-                    allCorrect = false;
+                    ProcessDecisionVersion(options);
+                }
+                else throw new InvalidArgumentException($"{options.ProblemVersion} is not a valid knapsack problem version. " +
+                    $"Valid versions:\n {ProblemVersions()}");
+
+            }
+            catch (InvalidArgumentException e)
+            {
+                Console.WriteLine($"INVALID ARGUMENT: {e.Message}");
+            }
+        }
+
+        static void ProcessDecisionVersion(CommandLineOptions options)
+        {
+            var strategy = GetDecisionStrategy(options.Strategy);
+            IList<DecisionKnapsackInstance> instances;
+
+            Console.WriteLine($"Opening file {options.InputFile}");
+            try
+            {
+                instances = InputReader.ReadDecisionKnapsackInstances(options.InputFile);
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine($"Could not open input instances file at {options.InputFile} ({e.Message})");
+                return;
+            }
+            catch (InvalidInputFormatException e)
+            {
+                Console.WriteLine($"Could not parse the input instances file: {e.Message}");
+                return;
+            }
+
+            var solutions = strategy.SolveAll(instances, options.Strategy, options.DataSetName);
+
+            if (options.ReferenceFile != null)
+            {
+                Console.WriteLine("Validating the results...");
+                try
+                {
+                    var referenceSolutions = InputReader.ReadReferenceSolutions(options.ReferenceFile);
+                    SolutionValidator.ValidateDecisionSolutions(solutions, referenceSolutions);
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine($"Could not open reference instances file at {options.ReferenceFile} ({e.Message})");
+                    return;
+                }
+                catch (InvalidInputFormatException e)
+                {
+                    Console.WriteLine($"Could not parse the reference instances file: {e.Message}");
+                    return;
                 }
             }
-            if (allCorrect)
-                Console.WriteLine("All solutions match the reference data");
-            else
-                Console.WriteLine("Not all solutions match the reference data, see the log above for more details");
+
+            try
+            {
+                OutputWriter.WriteAllResults(solutions, options.OutputFile);
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine($"Error while writing into the output file: {e.Message}");
+            }
         }
 
         static DecisionStrategy GetDecisionStrategy(string strategyField)
         {
-            if (strategyField.Equals("bruteforce", StringComparison.OrdinalIgnoreCase))
-                return new DecisionBruteForceStrategy();
+            if (strategyField.Equals("BruteForce", StringComparison.OrdinalIgnoreCase))
+                return new DecisionBruteForce();
             else if (strategyField.Equals("BranchAndBound", StringComparison.OrdinalIgnoreCase))
-                return new DecisionBranchBoundStrategy();
-            else if (strategyField.Equals("BranchAndBoundPriceAsc", StringComparison.OrdinalIgnoreCase))
-                return new DecisionPriceAscBranchBoundStrategy();
-            else if (strategyField.Equals("BranchAndBoundWeightAsc", StringComparison.OrdinalIgnoreCase))
-                return new DecisionWeightAscBranchBoundStrategy();
-            throw new InvalidArgumentException($"{strategyField} is not a valid strategy for decision version");
+                return new DecisionBranchBound();
+            else if (strategyField.Equals("BranchAndBoundSortedWeight", StringComparison.OrdinalIgnoreCase))
+                return new DecisionBranchBoundSortedWeight();
+            else if (strategyField.Equals("BranchAndBoundSortedPrice", StringComparison.OrdinalIgnoreCase))
+                return new DecisionBranchBoundSortedPrice();
+            else if (strategyField.Equals("BranchAndBoundSortedBoth", StringComparison.OrdinalIgnoreCase))
+                return new DecisionBranchBoundSortedBoth();
+            throw new InvalidArgumentException($"{strategyField} is not a valid strategy for decision version. Valid strategies: " +
+                $"\n {DecisionVersionStrategies()}");
         }
 
-        static IList<DecisionKnapsackInstance> ReadDecisionKnapsackInstances(string location)
+        static string DecisionVersionStrategies()
         {
-            var instances = new List<DecisionKnapsackInstance>();
-            using (StreamReader file = new StreamReader(location))
-            {
-                string ln;
-
-                while ((ln = file.ReadLine()) != null)
-                {
-                    var instance = InputFieldParser.ParseDecisionKnapsackInstance(ln);
-                    instances.Add(instance);
-                }
-            }
-            return instances;
+            return "BruteForce \n " +
+                "BranchAndBound \n " +
+                "BranchAndBoundSortedWeight \n " +
+                "BranchAndBoundSortedPrice \n " +
+                "BranchAndBoundSortedBoth";
         }
 
-        static void WriteResults(IList<DecisionSolution> solutions, string location)
+        static string ProblemVersions()
         {
-            ulong acc = 0;
-            foreach(var s in solutions)
-            {
-                Console.WriteLine($"Id:{s.KnapsackInstance.Id}, Number of steps:{s.NumberOfSteps}, result: {s.PermutationExists}");
-                acc += s.NumberOfSteps;
-            }
-
-            Console.WriteLine($"Total number of steps:{acc}");
+            return "Decision";
         }
-
-
-        static Dictionary<int, KnapsackReferenceSolution> ReadReferenceSolutions(string location)
-        {
-            var solutions = new Dictionary<int, KnapsackReferenceSolution>();
-            using (StreamReader file = new StreamReader(location))
-            {
-                string ln;
-
-                while ((ln = file.ReadLine()) != null)
-                {
-                    var solution = InputFieldParser.ParseSolution(ln);
-                    solutions[solution.Id] = solution;
-                }
-            }
-            return solutions;
-        }
-
-
     }
-
 }
