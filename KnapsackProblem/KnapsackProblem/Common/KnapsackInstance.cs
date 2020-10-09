@@ -5,12 +5,13 @@ using System.Linq;
 
 namespace KnapsackProblem.Common
 {
-    public abstract class KnapsackInstance
+    public class KnapsackInstance
     {
         public int Id { get; set; }
         public int KnapsackSize { get; set; }
 
         public IList<KnapsackItem> Items { get; set; }
+        public int ItemCount { get { return Items.Count; } }
 
         public int GetPriceOfAllItems()
         {

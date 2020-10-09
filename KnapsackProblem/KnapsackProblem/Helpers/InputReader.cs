@@ -9,22 +9,22 @@ namespace KnapsackProblem.Helpers
 {
     public static class InputReader
     {
-        public static IList<DecisionKnapsackInstance> ReadDecisionKnapsackInstances(string location)
+        public static IList<T> ReadKnapsackInstances<T>(string location, Func<string, T> instanceParser) where T: KnapsackInstance
         {
-
-            var instances = new List<DecisionKnapsackInstance>();
+            var instances = new List<T>();
             using (StreamReader file = new StreamReader(location))
             {
                 string ln;
 
                 while ((ln = file.ReadLine()) != null)
                 {
-                    var instance = InputFieldParser.ParseDecisionKnapsackInstance(ln);
+                    var instance = instanceParser(ln);
                     instances.Add(instance);
                 }
             }
             return instances;
         }
+
 
         public static Dictionary<int, KnapsackReferenceSolution> ReadReferenceSolutions(string location)
         {

@@ -7,13 +7,13 @@ namespace KnapsackProblem.DecisionVersion
 {
     public class DecisionBruteForce : DecisionStrategy
     {
-        public override DecisionSolution Solve(DecisionKnapsackInstance knapsackInstance)
+        public override DecisionResult Solve(DecisionKnapsackInstance knapsackInstance)
         {
             numberOfSteps = 0;
 
             bool permutationExists = DoesSolutionExist(knapsackInstance.Items.Count, 0, 0, knapsackInstance);
 
-            return new DecisionSolution { KnapsackInstance = knapsackInstance, NumberOfSteps = numberOfSteps, PermutationExists = permutationExists };
+            return new DecisionResult { KnapsackInstance = knapsackInstance, NumberOfSteps = numberOfSteps, PermutationExists = permutationExists };
         }
 
         bool DoesSolutionExist(int itemsRemaining, int currentPrice, int currentWeight, DecisionKnapsackInstance knapsackInstance)

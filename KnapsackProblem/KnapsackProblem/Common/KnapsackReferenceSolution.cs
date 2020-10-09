@@ -5,12 +5,8 @@ using System.Text;
 
 namespace KnapsackProblem.Common
 {
-    public class KnapsackReferenceSolution
+    public class KnapsackReferenceSolution: KnapsackSolution
     {
         public int Id { get; set; }
-        public int Price { get; set; }
-
-        public IList<bool> SolutionVector { get; set; }
-
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using KnapsackProblem.Common;
+using KnapsackProblem.ConstructiveVersion;
 using KnapsackProblem.DecisionVersion;
 using System;
 using System.Collections.Generic;
@@ -9,9 +11,9 @@ using System.Text;
 
 namespace KnapsackProblem.Helpers
 {
-    public sealed class SingleResultMap: ClassMap<DecisionSolution>
+    public sealed class DecisionResultMap: ClassMap<DecisionResult>
     {
-        public SingleResultMap()
+        public DecisionResultMap()
         {
             Map(m => m.KnapsackInstance.Id).Name("ID");
             Map(m => m.NumberOfSteps).Name("Number of steps");
@@ -19,12 +21,36 @@ namespace KnapsackProblem.Helpers
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
             Map(m => m.Strategy).Name("Strategy");
             Map(m => m.DataSetName).Name("Data set name");
-
         }
     }
+
+    public sealed class ConstructiveResultMap: ClassMap<ConstructiveResult>
+    {
+        public ConstructiveResultMap()
+        {
+            Map(m => m.KnapsackInstance.Id).Name("ID");
+            Map(m => m.NumberOfSteps).Name("Number of steps");
+            Map(m => m.Solution.SolutionVector).Name("Result vector");
+            Map(m => m.KnapsackInstance.Items.Count).Name("n");
+            Map(m => m.Strategy).Name("Strategy");
+            Map(m => m.DataSetName).Name("Data set name");
+        }
+    }
+
     public static class OutputWriter
     {
-        public static void WriteAllResults(IList<DecisionSolution> solutions, string location)
+        public static void WriteDecisionResults(IList<DecisionResult> results, string location)
+        {
+            WriteAllResults<DecisionResult, DecisionResultMap>(results, location);
+        }
+
+        public static void WriteConstructiveResults(IList<ConstructiveResult> results, string location)
+        {
+            WriteAllResults<ConstructiveResult, ConstructiveResultMap>(results, location);
+        }
+
+        public static void WriteAllResults<R, M>(IList<R> results, string location)
+            where M: ClassMap<R> 
         {
             bool fileExists = File.Exists(location);
 
@@ -33,9 +59,9 @@ namespace KnapsackProblem.Helpers
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 // Don't write the header if file already existed.
-                csv.Configuration.RegisterClassMap<SingleResultMap>();
+                csv.Configuration.RegisterClassMap<M>();
                 csv.Configuration.HasHeaderRecord = !fileExists;
-                csv.WriteRecords(solutions);
+                csv.WriteRecords(results);
                 csv.Flush();
             }
         }

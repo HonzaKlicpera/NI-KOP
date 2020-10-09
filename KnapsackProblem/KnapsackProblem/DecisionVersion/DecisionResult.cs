@@ -5,8 +5,8 @@ using System.Text;
 
 namespace KnapsackProblem.DecisionVersion
 {
-    public class DecisionKnapsackSolver
+    public class DecisionResult: AbstractResult<DecisionKnapsackInstance>
     {
-
+        public bool PermutationExists { get; set; }
     }
 }

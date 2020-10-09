@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KnapsackProblem.DecisionVersion
+namespace KnapsackProblem.Common
 {
-    public class DecisionSolution
+    public abstract class AbstractResult<I>
     {
         public ulong NumberOfSteps { get; set; }
-
-        public bool PermutationExists { get; set; }
 
         public string Strategy { get; set; }
 
         public string DataSetName { get; set; }
 
-        public DecisionKnapsackInstance KnapsackInstance { get; set; }
+        public I KnapsackInstance { get; set; }
     }
 }

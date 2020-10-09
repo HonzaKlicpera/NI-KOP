@@ -49,6 +49,18 @@ namespace KnapsackProblem.Helpers
             return new DecisionKnapsackInstance { Id = id, KnapsackSize = knapsackSize, MinimalPrice = minimalPrice, Items = items };
         }
 
+        public static KnapsackInstance ParseConstructiveKnapsackInstance(string inputLine)
+        {
+            var inputFields = inputLine.Split(' ');
+
+            var id = ParseIntField(inputFields[0], "Id");
+            var knapsackSize = ParseNonNegativeIntField(inputFields[2], "Knapsack size");
+            var items = ParseItems(inputFields.Skip(3).ToArray());
+
+            return new DecisionKnapsackInstance { Id = id, KnapsackSize = knapsackSize, Items = items };
+
+        }
+
         public static KnapsackReferenceSolution ParseSolution(string inputLine)
         {
             var inputFields = inputLine.Split(' ');

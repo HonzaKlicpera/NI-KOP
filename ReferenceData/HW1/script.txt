@@ -1,5 +1,5 @@
 $workfolder = "C:\\Users\\Johny\\source\\repos\\NI-KOP\\ReferenceData\\HW1"
-$strategies = "BranchAndBound","BranchAndBoundSorted"
+$strategies = "BranchAndBoundSortedBoth"
 $datasets = "N","Z"
 $datasets | ForEach-Object -Process {
 	$dataset = $_
