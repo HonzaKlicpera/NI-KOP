@@ -5,7 +5,7 @@ using System.Text;
 
 namespace KnapsackProblem.Common
 {
-    public class KnapsackReferenceSolution: KnapsackSolution
+    public class KnapsackReferenceSolution: KnapsackConfiguration
     {
         public int Id { get; set; }
     }

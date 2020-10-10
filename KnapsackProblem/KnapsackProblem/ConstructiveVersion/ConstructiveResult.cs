@@ -7,6 +7,6 @@ namespace KnapsackProblem.ConstructiveVersion
 {
     public class ConstructiveResult: AbstractResult<KnapsackInstance>
     {
-        public KnapsackSolution Solution { get; set; }
+        public KnapsackConfiguration Solution { get; set; }
     }
 }

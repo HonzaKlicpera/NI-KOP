@@ -3,30 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace KnapsackProblem.ConstructiveVersion.Strategies
 {
-    public struct KnapsackConfiguration
-    {
-        public int Price { get; set; }
-        public int Weight { get; set; }
-
-        public IList<bool> SolutionVector { get; set; }
-    }
 
     public class ConstructiveBruteForce : ConstructiveStrategy
     {
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
-            BestConfiguration = new KnapsackConfiguration { Price = int.MinValue, Weight = 0, SolutionVector = new List<bool>()};
+            BestConfiguration = new KnapsackConfiguration { Price = int.MinValue, Weight = 0, ItemVector = new List<bool>()};
             numberOfSteps = 0;
 
-            FindBestConfiguration(0, new KnapsackConfiguration { Price = 0, Weight = 0, SolutionVector = new List<bool>() }, instance);
+            FindBestConfiguration(0, new KnapsackConfiguration { Price = 0, Weight = 0, ItemVector = new List<bool>() }, instance);
 
             var result = new ConstructiveResult
             {
                 KnapsackInstance = instance,
                 NumberOfSteps = numberOfSteps,
-                Solution = new KnapsackSolution { Price = BestConfiguration.Price, SolutionVector = BestConfiguration.SolutionVector }
+                Solution = BestConfiguration
             };
             return result;
         }
@@ -46,17 +40,17 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             {
                 Price = currentConfiguration.Price,
                 Weight = currentConfiguration.Weight,
-                SolutionVector = new List<bool>(currentConfiguration.SolutionVector)
+                ItemVector = new List<bool>(currentConfiguration.ItemVector)
             };
-            leftConfiguration.SolutionVector.Add(false);
+            leftConfiguration.ItemVector.Add(false);
 
             var rightConfiguration = new KnapsackConfiguration
             {
                 Price = currentConfiguration.Price + currentItem.Price,
-                Weight = currentConfiguration.Weight + currentItem.Weight, 
-                SolutionVector = new List<bool>(currentConfiguration.SolutionVector)
+                Weight = currentConfiguration.Weight + currentItem.Weight,
+                ItemVector = new List<bool>(currentConfiguration.ItemVector)
             };
-            rightConfiguration.SolutionVector.Add(true);
+            rightConfiguration.ItemVector.Add(true);
 
             FindBestConfiguration(itemIndex + 1, leftConfiguration, instance);
             FindBestConfiguration(itemIndex + 1, rightConfiguration, instance);

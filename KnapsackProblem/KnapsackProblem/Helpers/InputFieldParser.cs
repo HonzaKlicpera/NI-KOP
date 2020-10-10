@@ -70,7 +70,7 @@ namespace KnapsackProblem.Helpers
 
             var solutionVector = ParseSolutionVector(inputFields.Skip(3).ToArray());
 
-            return new KnapsackReferenceSolution { Id = id, Price = price, SolutionVector = solutionVector };
+            return new KnapsackReferenceSolution { Id = id, Price = price, ItemVector = solutionVector };
         }
 
         public static List<bool> ParseSolutionVector(string[] fields)

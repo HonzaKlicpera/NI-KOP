@@ -43,21 +43,15 @@ namespace KnapsackProblem.Helpers
 
         public static bool ConstructiveComparator(ConstructiveResult result, KnapsackReferenceSolution referenceSolution)
         {
-            if (!result.Solution.SolutionVector.SequenceEqual(referenceSolution.SolutionVector))
+            if (!result.Solution.ItemVector.SequenceEqual(referenceSolution.ItemVector))
             {
                 Console.WriteLine($"Permutation instance solution (id {result.KnapsackInstance.Id}) incorrect," +
-                    $" result: {result.Solution.SolutionVector.Aggregate(new StringBuilder(), Aggregator)}," +
-                    $" expected result: {referenceSolution.SolutionVector.Aggregate(new StringBuilder(), Aggregator)}");
+                    $" result: {OutputWriter.ItemVectorToString(result.Solution.ItemVector)}" +
+                    $" expected result: {OutputWriter.ItemVectorToString(referenceSolution.ItemVector)}");
                 return false;
             }
             return true;
         }
 
-        private static StringBuilder Aggregator(StringBuilder acc, bool current)
-        {
-            acc.Append(current ? "1" : "0");
-            acc.Append(",");
-            return acc;
-        }
     }
 }

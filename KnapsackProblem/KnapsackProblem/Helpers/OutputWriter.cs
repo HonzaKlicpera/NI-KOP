@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using KnapsackProblem.Common;
 using KnapsackProblem.ConstructiveVersion;
 using KnapsackProblem.DecisionVersion;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace KnapsackProblem.Helpers
@@ -30,10 +32,18 @@ namespace KnapsackProblem.Helpers
         {
             Map(m => m.KnapsackInstance.Id).Name("ID");
             Map(m => m.NumberOfSteps).Name("Number of steps");
-            Map(m => m.Solution.SolutionVector).Name("Result vector");
+            Map(m => m.Solution.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
             Map(m => m.Strategy).Name("Strategy");
             Map(m => m.DataSetName).Name("Data set name");
+        }
+    }
+
+    public class ItemVectorConverter: DefaultTypeConverter
+    {
+        public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+        {
+            return OutputWriter.ItemVectorToString((IList<bool>) value);
         }
     }
 
@@ -66,6 +76,16 @@ namespace KnapsackProblem.Helpers
             }
         }
 
+        public static string ItemVectorToString(IList<bool> itemVector)
+        {
+            return itemVector.Aggregate(new StringBuilder(), ItemVectorAggregator).ToString();
+        }
 
+        private static StringBuilder ItemVectorAggregator(StringBuilder acc, bool current)
+        {
+            acc.Append(current ? "1" : "0");
+            acc.Append(" ");
+            return acc;
+        }
     }
 }
