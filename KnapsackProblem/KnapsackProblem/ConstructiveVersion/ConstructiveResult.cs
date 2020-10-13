@@ -7,6 +7,8 @@ namespace KnapsackProblem.ConstructiveVersion
 {
     public class ConstructiveResult: AbstractResult<KnapsackInstance>
     {
-        public KnapsackConfiguration Solution { get; set; }
+        public KnapsackConfiguration Configuration { get; set; }
+        public double RunTimeMs { get; set; }
+        public int ReferencePriceDiff { get; set; }
     }
 }

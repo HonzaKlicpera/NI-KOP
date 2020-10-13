@@ -25,7 +25,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             return new ConstructiveResult
             {
                 KnapsackInstance = instance,
-                Solution = knapsackConfiguration
+                Configuration = knapsackConfiguration
             };
         }
 

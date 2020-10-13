@@ -10,7 +10,6 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
             BestConfiguration = new KnapsackConfiguration { Price = int.MinValue, Weight = 0, ItemVector = CreateEmptySolution(instance.ItemCount) };
-            numberOfSteps = 0;
 
             FindBestConfiguration(0, new KnapsackConfiguration { Price = 0, Weight = 0, ItemVector = new List<bool>() }, instance.GetPriceOfAllItems(), instance);
 
@@ -18,7 +17,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             {
                 KnapsackInstance = instance,
                 NumberOfSteps = numberOfSteps,
-                Solution = BestConfiguration
+                Configuration = BestConfiguration
             };
             return result;
         }

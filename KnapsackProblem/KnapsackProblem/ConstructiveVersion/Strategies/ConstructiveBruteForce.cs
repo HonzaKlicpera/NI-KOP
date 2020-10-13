@@ -20,7 +20,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             {
                 KnapsackInstance = instance,
                 NumberOfSteps = numberOfSteps,
-                Solution = BestConfiguration
+                Configuration = BestConfiguration
             };
             return result;
         }

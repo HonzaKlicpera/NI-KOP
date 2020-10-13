@@ -18,7 +18,8 @@ namespace KnapsackProblem.ConstructiveVersion
                 return;
 
             var strategy = GetConstructiveStrategy(options.Strategy);
-            var results = strategy.SolveAll(instances, options.Strategy, options.DataSetName);
+            //var results = strategy.SolveAll(instances, options.Strategy, options.DataSetName);
+            var results = PerformanceTester.SolveWithPerformanceTest(instances, strategy, options);
 
             //Compare with the reference solution if specified
             if (options.ReferenceFile != null)
