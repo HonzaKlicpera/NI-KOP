@@ -43,11 +43,11 @@ namespace KnapsackProblem.Helpers
 
         public static bool ConstructiveComparator(ConstructiveResult result, KnapsackReferenceSolution referenceSolution)
         {
-            if (!result.Solution.ItemVector.SequenceEqual(referenceSolution.ItemVector))
+            if (result.Solution.Price != referenceSolution.Price || result.Solution.Weight > result.KnapsackInstance.KnapsackSize)
             {
                 Console.WriteLine($"Permutation instance solution (id {result.KnapsackInstance.Id}) incorrect," +
-                    $" result: {OutputWriter.ItemVectorToString(result.Solution.ItemVector)}" +
-                    $" expected result: {OutputWriter.ItemVectorToString(referenceSolution.ItemVector)}");
+                    $" result: {OutputWriter.ItemVectorToString(result.Solution.ItemVector)} (price {result.Solution.Price})" +
+                    $" expected result: {OutputWriter.ItemVectorToString(referenceSolution.ItemVector)} (price {referenceSolution.Price})");
                 return false;
             }
             return true;

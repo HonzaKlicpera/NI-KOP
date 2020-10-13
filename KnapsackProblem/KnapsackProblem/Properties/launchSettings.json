@@ -2,7 +2,7 @@
   "profiles": {
     "KnapsackProblem": {
       "commandName": "Project",
-      "commandLineArgs": "-i C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK10_inst.dat -p constructive -t C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK10_sol.dat -s Bruteforce -o C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\test.csv"
+      "commandLineArgs": "-i C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK10_inst.dat -p constructive -t C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK10_sol.dat -s DPPrice -o C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\test.csv"
     }
   }
 }

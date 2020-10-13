@@ -45,6 +45,10 @@ namespace KnapsackProblem.ConstructiveVersion
                 return new ConstructiveBruteForce();
             else if (strategyField.Equals("BranchAndBound", StringComparison.OrdinalIgnoreCase))
                 return new ConstructiveBranchBound();
+            else if (strategyField.Equals("DPCapacity", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveDPCapacity();
+            else if (strategyField.Equals("DPPrice", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveDPPrice();
             throw new InvalidArgumentException($"{strategyField} is not a valid strategy for decision version. Valid strategies: " +
                 $"\n {ConstructiveVersionStrategies()}");
         }
