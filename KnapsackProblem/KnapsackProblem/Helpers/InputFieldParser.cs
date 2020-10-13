@@ -99,18 +99,18 @@ namespace KnapsackProblem.Helpers
 
             for (int i = 0; i < fields.Length; i += 2)
             {
-                items.Add(ParseItem(fields[i], fields[i + 1]));
+                items.Add(ParseItem(fields[i], fields[i + 1], i/2));
             }
 
             return items;
         }
 
-        public static KnapsackItem ParseItem(string weightField, string priceField)
+        public static KnapsackItem ParseItem(string weightField, string priceField, int itemId)
         {
             int price = ParseNonNegativeIntField(priceField, "Item price");
             int weight = ParseNonNegativeIntField(weightField, "Item weight");
 
-            return new KnapsackItem { Price = price, Weight = weight };
+            return new KnapsackItem { Price = price, Weight = weight, Id = itemId };
         }
     }
 }

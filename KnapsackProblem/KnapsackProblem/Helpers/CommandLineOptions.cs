@@ -24,5 +24,12 @@ namespace KnapsackProblem.Helpers
 
         [Option("setname", Default = "", HelpText = "The input data set name")]
         public string DataSetName { get; set; }
+
+        [Option("repeatCount", Default = 1, HelpText = "How many times should the benchmark be repeated for each instance")]
+        public int RepeatCount { get; set; }
+
+        [Option("immediateRepeatCount", Default = 1, HelpText = "Use when instances are too tiny to be measured separately, " +
+            "it however increases the risk of GC running in middle of execution")]
+        public int ImmediateRepeatCount { get; set; }
     }
 }

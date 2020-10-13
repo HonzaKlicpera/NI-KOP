@@ -31,10 +31,11 @@ namespace KnapsackProblem.Helpers
         public ConstructiveResultMap()
         {
             Map(m => m.KnapsackInstance.Id).Name("ID");
-            Map(m => m.NumberOfSteps).Name("Number of steps");
-            Map(m => m.Solution.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
+            Map(m => m.RunTimeMs).Name("Average Runtime [ms]");
+            Map(m => m.Configuration.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
-            Map(m => m.Strategy).Name("Strategy");
+            Map(m => m.ReferencePriceDiff).Name("Reference price difference");
+            Map(m => m.Strategy).Name("Strategy"); 
             Map(m => m.DataSetName).Name("Data set name");
         }
     }
