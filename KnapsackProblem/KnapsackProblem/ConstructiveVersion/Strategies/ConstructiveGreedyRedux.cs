@@ -8,6 +8,11 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
 {
     public class ConstructiveGreedyRedux : ConstructiveStrategy
     {
+        public override void FreeAll()
+        {
+            
+        }
+
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
             var greedyStrategy = new ConstructiveGreedy();

@@ -8,6 +8,11 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
 {
     public class ConstructiveGreedy : ConstructiveStrategy
     {
+        public override void FreeAll()
+        {
+            
+        }
+
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
             //Make a shallow copy of instances list in order to not affect next possible execution

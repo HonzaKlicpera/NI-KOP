@@ -76,7 +76,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             if (nextCell == null || nextCell.Value < newPrice) {
                 memoryTable[newWeight, currentItemIndex + 1] = new DPCell
                 {
-                    AddedItem = (item == null),
+                    AddedItem = (item != null),
                     PreviousCell = currentCell,
                     Value = newPrice
                 };

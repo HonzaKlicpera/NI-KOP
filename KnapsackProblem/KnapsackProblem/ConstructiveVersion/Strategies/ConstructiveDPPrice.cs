@@ -10,6 +10,12 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
     {
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
+            if (instance.ItemCount == 0)
+                return new ConstructiveResult
+                {
+                    KnapsackInstance = instance,
+                    Configuration = new KnapsackConfiguration { ItemVector = new List<bool>(), Price = 0, Weight = 0}
+                };
             FillTable(instance);
             int bestPrice;
             var bestCell = FindBestCell(instance, out bestPrice);
@@ -47,7 +53,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             toVisit.Enqueue(0);
             memoryTable[0, 0] = new DPCell { AddedItem = false, Value = 0 };
             var firstItem = instance.Items.First();
-            if (firstItem.Weight <= instance.KnapsackSize)
+            if (firstItem.Weight <= instance.KnapsackSize && firstItem.Price > 0)
             {
                 toVisit.Enqueue(firstItem.Price);
                 memoryTable[firstItem.Price, 0] = new DPCell { AddedItem = true, Value = firstItem.Weight };
@@ -75,7 +81,7 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             {
                 memoryTable[newPrice, currentItemIndex + 1] = new DPCell
                 {
-                    AddedItem = (item == null),
+                    AddedItem = (item != null),
                     PreviousCell = currentCell,
                     Value = newWeight
                 };

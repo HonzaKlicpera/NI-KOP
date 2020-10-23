@@ -34,7 +34,7 @@ namespace KnapsackProblem.Helpers
             Map(m => m.RunTimeMs).Name("Average Runtime [ms]");
             Map(m => m.Configuration.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
-            Map(m => m.ReferencePriceDiff).Name("Reference price difference");
+            Map(m => m.Epsilon).Name("Epsilon");
             Map(m => m.Strategy).Name("Strategy"); 
             Map(m => m.DataSetName).Name("Data set name");
         }

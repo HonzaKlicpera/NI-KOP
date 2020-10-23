@@ -7,6 +7,10 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
 {
     public class ConstructiveDPBoth : ConstructiveStrategy
     {
+        public override void FreeAll()
+        {
+        }
+
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
             ConstructiveStrategy strategy;

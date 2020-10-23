@@ -20,6 +20,12 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
 
         protected abstract void InitializeTable(KnapsackInstance instance);
 
+        public override void FreeAll()
+        {
+            memoryTable = null;
+            toVisit = null;
+        }
+
 
         protected void FillTable(KnapsackInstance instance)
         {

@@ -9,6 +9,6 @@ namespace KnapsackProblem.ConstructiveVersion
     {
         public KnapsackConfiguration Configuration { get; set; }
         public double RunTimeMs { get; set; }
-        public int ReferencePriceDiff { get; set; }
+        public double Epsilon { get; set; }
     }
 }

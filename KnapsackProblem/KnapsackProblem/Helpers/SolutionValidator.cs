@@ -43,7 +43,14 @@ namespace KnapsackProblem.Helpers
 
         public static bool ConstructiveComparator(ConstructiveResult result, KnapsackReferenceSolution referenceSolution)
         {
-            result.ReferencePriceDiff = referenceSolution.Price - result.Configuration.Price;
+            //Calculate and save epsilon
+            var optimalPrice = referenceSolution.Price;
+            var actualPrice = result.Configuration.Price;
+            if (Math.Max(actualPrice, optimalPrice) == 0)
+                result.Epsilon = 0;
+            else 
+                result.Epsilon = (float) Math.Abs(actualPrice - optimalPrice) / Math.Max(actualPrice, optimalPrice);
+
             if (result.Configuration.Price != referenceSolution.Price || result.Configuration.Weight > result.KnapsackInstance.KnapsackSize)
             {
                 Console.WriteLine($"Permutation instance solution (id {result.KnapsackInstance.Id}) incorrect," +

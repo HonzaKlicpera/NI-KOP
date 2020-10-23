@@ -9,6 +9,7 @@ namespace KnapsackProblem.Common
     {
         public int Id { get; set; }
         public int KnapsackSize { get; set; }
+        public float ApproximationAccuracy { get; set; }
 
         public IList<KnapsackItem> Items { get; set; }
         public int ItemCount { get { return Items.Count; } }

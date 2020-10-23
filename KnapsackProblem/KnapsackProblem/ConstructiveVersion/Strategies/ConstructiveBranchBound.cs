@@ -7,6 +7,10 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
 {
     public class ConstructiveBranchBound : ConstructiveStrategy
     {
+        public override void FreeAll()
+        {
+        }
+
         public override ConstructiveResult Solve(KnapsackInstance instance)
         {
             BestConfiguration = new KnapsackConfiguration { Price = int.MinValue, Weight = 0, ItemVector = CreateEmptySolution(instance.ItemCount) };

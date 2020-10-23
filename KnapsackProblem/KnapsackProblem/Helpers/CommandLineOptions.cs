@@ -28,8 +28,7 @@ namespace KnapsackProblem.Helpers
         [Option("repeatCount", Default = 1, HelpText = "How many times should the benchmark be repeated for each instance")]
         public int RepeatCount { get; set; }
 
-        [Option("immediateRepeatCount", Default = 1, HelpText = "Use when instances are too tiny to be measured separately, " +
-            "it however increases the risk of GC running in middle of execution")]
-        public int ImmediateRepeatCount { get; set; }
+        [Option("aprAccuracy", Default = 1.0f, HelpText = "Approximation accuracy for FPTAS")]
+        public float ApproximationAccuracy { get; set; }
     }
 }

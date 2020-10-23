@@ -18,6 +18,9 @@ namespace KnapsackProblem.ConstructiveVersion
                 return;
 
             var strategy = GetConstructiveStrategy(options.Strategy);
+            if (typeof(ConstructiveFPTAS).IsInstanceOfType(strategy))
+                AddAproxToInstances(instances, options);
+
             //var results = strategy.SolveAll(instances, options.Strategy, options.DataSetName);
             var results = PerformanceTester.SolveWithPerformanceTest(instances, strategy, options);
 
@@ -27,6 +30,8 @@ namespace KnapsackProblem.ConstructiveVersion
                 if (!ValidateResults<ConstructiveResult, KnapsackInstance>(results, options.ReferenceFile, SolutionValidator.ConstructiveComparator))
                     return;
             }
+
+            
 
             //Output the solution
             try
@@ -50,14 +55,34 @@ namespace KnapsackProblem.ConstructiveVersion
                 return new ConstructiveDPCapacity();
             else if (strategyField.Equals("DPPrice", StringComparison.OrdinalIgnoreCase))
                 return new ConstructiveDPPrice();
+            else if (strategyField.Equals("DPBoth", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveDPBoth();
+            else if (strategyField.Equals("Greedy", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveGreedy();
+            else if (strategyField.Equals("GreedyRedux", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveGreedyRedux();
+            else if (strategyField.Equals("FPTAS", StringComparison.OrdinalIgnoreCase))
+                return new ConstructiveFPTAS();
             throw new InvalidArgumentException($"{strategyField} is not a valid strategy for decision version. Valid strategies: " +
                 $"\n {ConstructiveVersionStrategies()}");
+        }
+
+        private void AddAproxToInstances(IList<KnapsackInstance> instances, CommandLineOptions options)
+        {
+            foreach (var instance in instances)
+                instance.ApproximationAccuracy = options.ApproximationAccuracy;
         }
 
         static string ConstructiveVersionStrategies()
         {
             return "BruteForce \n " +
-                "BranchAndBound \n ";
+                "BranchAndBound \n " +
+                "DPCapacity \n " +
+                "DPPrice \n " +
+                "DPBoth \n " +
+                "Greedy\n " +
+                "GreedyRedux \n " +
+                "FPTAS \n";
         }
     }
 }

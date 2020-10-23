@@ -10,6 +10,8 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
     {
         protected KnapsackConfiguration BestConfiguration;
 
+        public abstract void FreeAll();
+
         protected IList<bool> CreateEmptySolution(int n)
         {
             var emptySolution = new List<bool>();

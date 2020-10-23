@@ -6,15 +6,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 namespace KnapsackProblem.Helpers
 {
     public static class PerformanceTester
     {
-        public static IList<ConstructiveResult> SolveWithPerformanceTest(IList<KnapsackInstance> instances, ConstructiveStrategy strategy, CommandLineOptions options)
+        public static int REPEAT_COUNT = 5;
+
+        private static void PreparePerformanceTest(IList<KnapsackInstance> instances, ConstructiveStrategy strategy)
         {
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
+
+            //Warmup
+            strategy.SolveAll(instances.Take(15).ToList(), "", "");
+        }
+
+        public static IList<ConstructiveResult> SolveWithPerformanceTest(IList<KnapsackInstance> instances, ConstructiveStrategy strategy, CommandLineOptions options)
+        {
+            PreparePerformanceTest(instances, strategy);
 
             var stopWatch = new Stopwatch();
             var results = new List<ConstructiveResult>();
@@ -24,24 +35,28 @@ namespace KnapsackProblem.Helpers
                 Console.WriteLine($"Processing instance no. {instance.Id}");
                 ConstructiveResult result = null;
 
-                for(int i = 0; i < options.RepeatCount; i++)
+                //The algorithm must run repeat at least the set amount of times;
+                for(int i = 0; i < REPEAT_COUNT; i++)
                 {
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
 
-                    GC.TryStartNoGCRegion(100000000);
+                    //GC.TryStartNoGCRegion(200000000);
                     stopWatch.Start();
                     result = strategy.Solve(instance);
                     stopWatch.Stop();
-                    GC.EndNoGCRegion();
+                    strategy.FreeAll();
+                    //GC.EndNoGCRegion();
                 }
-                var averageRuntime = (double) stopWatch.ElapsedMilliseconds / options.RepeatCount;
+                var averageRuntime = stopWatch.Elapsed.TotalMilliseconds / REPEAT_COUNT;
 
+                //Save only the last result
                 if (result != null)
                 {
                     result.DataSetName = options.DataSetName;
                     result.RunTimeMs = averageRuntime;
-                    result.Strategy = options.Strategy;
+                    if(result.Strategy == null)
+                        result.Strategy = options.Strategy;
                     results.Add(result);
                 }
 
