@@ -43,5 +43,6 @@ namespace KnapsackProblem.ConstructiveVersion.Strategies
             };
 
         }
+
     }
 }
