@@ -1,11 +1,13 @@
 ﻿using CommandLine;
 using KnapsackAnnealing.Common;
+using KnapsackAnnealing.Solver;
 using KnapsackProblem.Common;
 using KnapsackProblem.Exceptions;
 using KnapsackProblem.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 
 namespace KnapsackAnnealing
 {
@@ -17,17 +19,23 @@ namespace KnapsackAnnealing
                 o => ProcessArguments(o));
         }
 
-        static void ProcessArguments(CommandLineOptions options)
+        static void ProcessArguments(CommandLineOptions cmdLineOptions)
         {
-            IList<KnapsackResult> results = null;
+            IList<KnapsackResult> results = new List<KnapsackResult>();
             try
             {
                 //Process and load input instances
-                var instances = InputReader.ReadKnapsackInstances(options.InputFile);
-                var annealingOptions = GetAnnealingOptions(options);
+                var instances = InputReader.ReadKnapsackInstances(cmdLineOptions.InputFile);
+                /*
+                var annealingOptions = GetAnnealingOptions(cmdLineOptions);
+                foreach (var instance in instances) {
+                    var solver = new SimulatedAnnealingSolver(instance, annealingOptions);
+                    results.Add(solver.Solve());
+                }
 
                 //var results = strategy.SolveAll(instances, options.Strategy, options.DataSetName);
-                //results = PerformanceTester.SolveWithPerformanceTest(instances, options);
+                */
+                results = PerformanceTester.SolveWithPerformanceTest(instances);
             }
             catch (InvalidArgumentException e)
             {
@@ -35,7 +43,7 @@ namespace KnapsackAnnealing
             }
             catch (IOException e)
             {
-                Console.WriteLine($"Could not open input instances file at {options.InputFile} ({e.Message})");
+                Console.WriteLine($"Could not open input instances file at {cmdLineOptions.InputFile} ({e.Message})");
             }
             catch (InvalidInputFormatException e)
             {
@@ -45,7 +53,7 @@ namespace KnapsackAnnealing
             //Output the solution
             try
             {
-                OutputWriter.WriteConstructiveResults(results, options.OutputFile);
+                OutputWriter.WriteConstructiveResults(results, cmdLineOptions.OutputFile);
             }
             catch (IOException e)
             {
@@ -53,12 +61,6 @@ namespace KnapsackAnnealing
             }
         }
 
-        static AnnealingOptions GetAnnealingOptions(CommandLineOptions commandLineOptions)
-        {
-            var annealingOptions = new AnnealingOptions();
-
-
-            return annealingOptions;
-        }
+        
     }
 }

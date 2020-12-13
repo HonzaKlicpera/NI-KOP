@@ -12,12 +12,12 @@ namespace KnapsackAnnealing.Common
 {
     public class AnnealingOptions
     {
-        public float StartingTemperature { get; set; }
+        public float BaseStartingTemperature { get; set; }
         public float CoolingCoefficient { get; set; }
         public float MinimalTemperature { get; set; }
 
         public ICoolingStrategy CoolStrategy { get; set; }
-        public IEquilibriumStrategy EquilibriumStrategy { get; set; }
+        public EquilibriumStrategy EquilibriumStrategy { get; set; }
         public IFrozenStrategy FrozenStrategy { get; set; }
         public ITryStrategy TryStrategy { get; set; }
         public IStartingPositionStrategy StartingPositionStrategy { get; set; }

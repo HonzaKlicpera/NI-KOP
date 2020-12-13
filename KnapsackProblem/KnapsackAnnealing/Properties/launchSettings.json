@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KnapsackAnnealing": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW4\\\\NK\\\\NK20_inst.dat  -o C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW4\\\\results.csv"
+    }
+  }
+}

@@ -14,31 +14,37 @@ namespace KnapsackAnnealing.Solver.TryStrategies
             random = new Random(seed);
         }
         //Performs a random bit-flip
-        public KnapsackConfiguration Try(SimulatedAnnealingSolver solverInstance)
+        public bool Try(SimulatedAnnealingSolver solverInstance, ref KnapsackConfiguration currentConfiguration)
         {
             var bitToFlip = random.Next(0, solverInstance.Instance.ItemCount - 1);
-            var configuration = new KnapsackConfiguration(solverInstance.CurrentConfiguration);
+            var triedConfiguration = new KnapsackConfiguration(currentConfiguration);
 
-            configuration.ItemVector[bitToFlip] = !configuration.ItemVector[bitToFlip];
-            if (configuration.ItemVector[bitToFlip])
+            triedConfiguration.ItemVector[bitToFlip] = !triedConfiguration.ItemVector[bitToFlip];
+            if (triedConfiguration.ItemVector[bitToFlip])
             {
-                configuration.Price += solverInstance.Instance.Items[bitToFlip].Price;
-                configuration.Weight += solverInstance.Instance.Items[bitToFlip].Weight;
+                triedConfiguration.Price += solverInstance.Instance.Items[bitToFlip].Price;
+                triedConfiguration.Weight += solverInstance.Instance.Items[bitToFlip].Weight;
             }
             else
             {
-                configuration.Price -= solverInstance.Instance.Items[bitToFlip].Price;
-                configuration.Weight -= solverInstance.Instance.Items[bitToFlip].Weight;
+                triedConfiguration.Price -= solverInstance.Instance.Items[bitToFlip].Price;
+                triedConfiguration.Weight -= solverInstance.Instance.Items[bitToFlip].Weight;
             }
-            configuration.Score = solverInstance.Options.ScoreStrategy.Score(configuration, solverInstance);
+            triedConfiguration.Score = solverInstance.Options.ScoreStrategy.Score(triedConfiguration, solverInstance);
 
-            if (configuration.Score >= solverInstance.CurrentConfiguration.Score)
-                return configuration;
+            if (triedConfiguration.Score >= currentConfiguration.Score)
+            {
+                currentConfiguration = triedConfiguration;
+                return true;
+            }
 
-            var delta = configuration.Score - solverInstance.CurrentConfiguration.Score;
+            var delta = triedConfiguration.Score - currentConfiguration.Score;
             if (random.NextDouble() < Math.Exp(delta / solverInstance.CurrentTemperature))
-                return configuration;
-            return solverInstance.CurrentConfiguration;
+            {
+                currentConfiguration = triedConfiguration;
+                return true;
+            }
+            return false;
         }
     }
 }

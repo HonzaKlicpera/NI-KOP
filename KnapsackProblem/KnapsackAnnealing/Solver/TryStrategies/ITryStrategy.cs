@@ -7,6 +7,6 @@ namespace KnapsackAnnealing.Solver.TryStrategies
 {
     public interface ITryStrategy
     {
-        public KnapsackConfiguration Try(SimulatedAnnealingSolver solverInstance);
+        public bool Try(SimulatedAnnealingSolver solverInstance, ref KnapsackConfiguration knapsackConfiguration);
     }
 }

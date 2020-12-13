@@ -21,6 +21,7 @@ namespace KnapsackProblem.Helpers
             Map(m => m.Configuration.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
             Map(m => m.KnapsackInstance.Items.Count).Name("n");
             Map(m => m.Epsilon).Name("Epsilon");
+            Map(m => m.WatchedParameter).Name("Watched Parameter");
         }
     }
 

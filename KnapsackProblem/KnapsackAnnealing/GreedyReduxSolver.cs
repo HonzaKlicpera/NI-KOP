@@ -15,10 +15,11 @@ namespace KnapsackAnnealing
 
             var biggestLegalItem = sorted.FirstOrDefault(i => i.Weight <= instance.KnapsackSize);
             var addedItemsVector = new bool[instance.ItemCount];
-            addedItemsVector[biggestLegalItem.Id] = true;
-
-            if (biggestLegalItem.Price <= greedyResult.Configuration.Price)
+                
+            if (biggestLegalItem == null || biggestLegalItem.Price <= greedyResult.Configuration.Price)
                 return greedyResult;
+
+            addedItemsVector[biggestLegalItem.Id] = true;
             return new KnapsackResult
             {
                 KnapsackInstance = instance,

@@ -12,5 +12,6 @@ namespace KnapsackProblem.Common
         public ulong NumberOfSteps { get; set; }
         public double RunTimeMs { get; set; }
         public double Epsilon { get; set; }
+        public string WatchedParameter { get; set; }
     }
 }
