@@ -35,13 +35,8 @@ namespace KnapsackProblem.Helpers
 
     public static class OutputWriter
     {
-        public static void WriteConstructiveResults(IList<KnapsackResult> results, string location)
-        {
-            WriteAllResults<KnapsackResult, ConstructiveResultMap>(results, location);
-        }
 
-        public static void WriteAllResults<R, M>(IList<R> results, string location)
-            where M: ClassMap<R> 
+        public static void WriteAllResults(IList<KnapsackResult> results, string location)
         {
             bool fileExists = File.Exists(location);
 
@@ -50,7 +45,7 @@ namespace KnapsackProblem.Helpers
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 // Don't write the header if file already existed.
-                csv.Configuration.RegisterClassMap<M>();
+                csv.Configuration.RegisterClassMap<ConstructiveResultMap>();
                 csv.Configuration.HasHeaderRecord = !fileExists;
                 csv.WriteRecords(results);
                 csv.Flush();

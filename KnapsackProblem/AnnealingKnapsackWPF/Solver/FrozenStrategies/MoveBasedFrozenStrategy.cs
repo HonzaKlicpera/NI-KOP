@@ -8,8 +8,14 @@ namespace KnapsackAnnealing.Solver.FrozenStrategies
     {
         public bool Frozen(SimulatedAnnealingSolver solverInstance)
         {
+            float rejectedRatio;
+            if (solverInstance.EquilibriumSteps == 0)
+                rejectedRatio = 0.0f;
+            else
+                rejectedRatio = 1.0f - ((float)solverInstance.AcceptedDuringEquilibrium / solverInstance.EquilibriumSteps);
+
             if (solverInstance.CurrentTemperature <= solverInstance.Options.MinimalTemperature
-                || solverInstance.UnacceptedInARow >= solverInstance.Options.MaxUnaccepted)
+                || rejectedRatio >= solverInstance.Options.MaxRejectedRatio)
                 return true;
             return false;
         }

@@ -13,8 +13,8 @@ namespace KnapsackAnnealing.Solver
         public AnnealingOptions Options { get; private set; }
         public ulong NumberOfSteps;
 
-        public int UnacceptedInARow { get; private set; }
         public int AcceptedDuringEquilibrium { get; private set; }
+        public int EquilibriumSteps { get; private set; }
 
         public float CurrentTemperature { get; private set; }
         public KnapsackConfiguration BestConfiguration { get; private set; }
@@ -37,24 +37,21 @@ namespace KnapsackAnnealing.Solver
             while (!Options.FrozenStrategy.Frozen(this))
             {
                 AcceptedDuringEquilibrium = 0;
+                EquilibriumSteps = 0;
 
                 while(Options.EquilibriumStrategy.Equilibrium(this))
                 {
-                    NumberOfSteps++;
-                    movesHistory.Add(new DataPoint(NumberOfSteps, currentConfiguration.Price));
+                    EquilibriumSteps++;
+                    movesHistory.Add(new DataPoint((int) NumberOfSteps + EquilibriumSteps, currentConfiguration.Price));
                     //Try to accept a new state
                     if (Options.TryStrategy.Try(this, ref currentConfiguration))
-                    {
-                        UnacceptedInARow = 0;
                         AcceptedDuringEquilibrium++;
-                    }
-                    else
-                        UnacceptedInARow++;
-                    //Check if new state is better than the best discovered so far
+                    //Check if new maximum has been found
                     if (currentConfiguration.Price > BestConfiguration.Price && currentConfiguration.Weight <= Instance.KnapsackSize)
                         BestConfiguration = currentConfiguration;
                 }
                 CurrentTemperature = Options.CoolStrategy.Cool(this);
+                NumberOfSteps += (ulong) EquilibriumSteps;
             }
             return new KnapsackResult { Configuration = BestConfiguration,
                 KnapsackInstance = Instance,

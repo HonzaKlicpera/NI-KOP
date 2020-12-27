@@ -16,9 +16,11 @@ namespace KnapsackAnnealing.Common
         public float CoolingCoefficient { get; set; }
         public float MinimalTemperature { get; set; }
         public int BaseEquilibriumSteps { get; set; }
-        //Max number of states that can be unaccepted in a row before frozen returns true (only works for MoveBasedFrozenStrategy)
-        public int MaxUnaccepted { get; set; }
+        //Maximal ratio of rejected states during an equilibrium
+        public float MaxRejectedRatio { get; set; }
         public float PenaltyMultiplier { get; set; }
+
+        public bool SavePlotInfo { get; set; }
 
         public ICoolingStrategy CoolStrategy { get; set; }
         public EquilibriumStrategy EquilibriumStrategy { get; set; }

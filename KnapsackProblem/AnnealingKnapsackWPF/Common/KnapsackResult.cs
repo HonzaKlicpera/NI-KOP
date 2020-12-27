@@ -8,7 +8,10 @@ namespace KnapsackProblem.Common
     public class KnapsackResult
     {
         public KnapsackInstance KnapsackInstance { get; set; }
+        //Actual configuration of the result
         public KnapsackConfiguration Configuration { get; set; }
+        //Optimal configuration retrieved using B&B
+        public KnapsackConfiguration OptimalConfiguration { get; set; }
 
         public IList<DataPoint> MovesHistory { get; set; }
 

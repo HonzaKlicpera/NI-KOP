@@ -12,11 +12,14 @@ using KnapsackProblem.ConstructiveVersion.Strategies;
 
 namespace KnapsackProblem.Helpers
 {
-    public static class PerformanceTester
+    public class PerformanceTester
     {
+        public delegate void InstanceCalculationFinished();
+        public  event InstanceCalculationFinished RaiseInstanceCalculationFinished;
+
         public static int REPEAT_COUNT = 5;
 
-        private static void PreparePerformanceTest(IList<KnapsackInstance> instances)
+        private void PreparePerformanceTest(IList<KnapsackInstance> instances)
         {
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -25,18 +28,22 @@ namespace KnapsackProblem.Helpers
             //strategy.SolveAll(instances.Take(15).ToList(), "", "");
         }
 
-
-        public static float GetEpsilonOfSolution(int solutionPrice, KnapsackInstance instance)
+        private KnapsackConfiguration GetOptimalConfiguration(KnapsackInstance instance)
         {
             var branchAndBoundSolver = new BranchBoundSolver();
-            var optimalPrice = branchAndBoundSolver.Solve(instance).Configuration.Price;
-            if (Math.Max(solutionPrice, optimalPrice) == 0)
-                return 0;
-            else
-                return  (float)Math.Abs(solutionPrice - optimalPrice) / Math.Max(solutionPrice, optimalPrice);
+            var optimalSolution = branchAndBoundSolver.Solve(instance);
+            return optimalSolution.Configuration;
         }
 
-        public static IList<KnapsackResult> SolveWithPerformanceTest(IList<KnapsackInstance> instances, AnnealingOptions options)
+        private float GetEpsilonOfSolution(int resultPrice, int optimalPrice)
+        {
+            if (Math.Max(resultPrice, optimalPrice) == 0)
+                return 0;
+            else
+                return  (float)Math.Abs(resultPrice - optimalPrice) / Math.Max(resultPrice, optimalPrice);
+        }
+
+        public IList<KnapsackResult> SolveWithPerformanceTest(IList<KnapsackInstance> instances, AnnealingOptions options)
         {
             PreparePerformanceTest(instances);
 
@@ -66,12 +73,13 @@ namespace KnapsackProblem.Helpers
                 //Save only the last result
                 if (result != null)
                 {
+                    var optimalConfiguration = GetOptimalConfiguration(instance);
                     result.RunTimeMs = averageRuntime;
-                    result.Epsilon = GetEpsilonOfSolution(result.Configuration.Price, instance);
-                    //result.WatchedParameter = AnnealingSolverConfig.BASE_STARTING_TEMPERATURE.ToString();
+                    result.OptimalConfiguration = optimalConfiguration;
+                    result.Epsilon = GetEpsilonOfSolution(result.Configuration.Price, optimalConfiguration.Price);
                     results.Add(result);
                 }
-
+                RaiseInstanceCalculationFinished();
                 stopWatch.Reset();
             }
 
