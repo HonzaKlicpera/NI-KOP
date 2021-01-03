@@ -16,7 +16,7 @@ namespace AnnealingWPF.Helpers
         public delegate void InstanceCalculationFinished();
         public  event InstanceCalculationFinished RaiseInstanceCalculationFinished;
 
-        public static int REPEAT_COUNT = 5;
+        public static int REPEAT_COUNT = 1;
 
         private void PreparePerformanceTest(IList<SatInstance> instances)
         {
@@ -25,14 +25,6 @@ namespace AnnealingWPF.Helpers
 
             //Warmup
             //strategy.SolveAll(instances.Take(15).ToList(), "", "");
-        }
-
-        private float GetEpsilonOfSolution(int resultPrice, int optimalPrice)
-        {
-            if (Math.Max(resultPrice, optimalPrice) == 0)
-                return 0;
-            else
-                return  (float)Math.Abs(resultPrice - optimalPrice) / Math.Max(resultPrice, optimalPrice);
         }
 
         public IList<SatResult> SolveWithPerformanceTest(IList<SatInstance> instances, AnnealingOptions options)
@@ -65,9 +57,7 @@ namespace AnnealingWPF.Helpers
                 //Save only the last result
                 if (result != null)
                 {
-                    //TODO - load optimal configuration
                     result.RunTimeMs = averageRuntime;
-                    result.Epsilon = GetEpsilonOfSolution(result.Configuration.GetOptimalizationValue(), result.OptimalConfiguration.GetOptimalizationValue());
                     results.Add(result);
                 }
                 RaiseInstanceCalculationFinished();

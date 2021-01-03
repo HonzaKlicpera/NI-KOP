@@ -25,7 +25,7 @@ namespace AnnealingWPF.Common
         public ICoolingStrategy CoolStrategy { get; set; }
         public EquilibriumStrategy EquilibriumStrategy { get; set; }
         public IFrozenStrategy FrozenStrategy { get; set; }
-        public ITryStrategy TryStrategy { get; set; }
+        public TryStrategy TryStrategy { get; set; }
         public IStartingPositionStrategy StartingPositionStrategy { get; set; }
         public IScoreStrategy ScoreStrategy { get; set; }
     }

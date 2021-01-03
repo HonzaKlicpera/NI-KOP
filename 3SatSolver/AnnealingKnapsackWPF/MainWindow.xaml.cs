@@ -15,6 +15,7 @@ using AnnealingWPF.Solver.StartingPositionStrategies;
 using AnnealingWPF.Solver.TryStrategies;
 using AnnealingKnapsackWPF.Solver.StartingPositionStrategies;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics;
 
 namespace AnnealingKnapsackWPF
 {
@@ -26,6 +27,12 @@ namespace AnnealingKnapsackWPF
 
         private int numberOfFinishedInstances;
         private int numberOfInstancesTotal;
+
+        private IList<SatInstance> loadedInstances;
+        private string loadedInstanceLocation;
+
+        private IDictionary<int, ReferenceConfiguration> loadedReferenceConfigurations;
+        private string loadedReferenceConfigurationsLocation;
 
         public MainWindow()
         {
@@ -69,7 +76,7 @@ namespace AnnealingKnapsackWPF
             }
         }
 
-        private AnnealingOptions GetOptions()
+        private AnnealingOptions GetOptions(bool savePlotInfo)
         {
             
             int seed;
@@ -87,15 +94,15 @@ namespace AnnealingKnapsackWPF
                 CoolStrategy = new CoefficientCoolingStrategy(),
                 EquilibriumStrategy = GetEquilibriumStrategy(),
                 FrozenStrategy = GetFrozenStrategy(),
-                ScoreStrategy = new LinearScoreStrategy(),
-                StartingPositionStrategy = GetStartingPositionStrategy(seed),
+                ScoreStrategy = GetScoreStrategy(),
+                StartingPositionStrategy = new RandomStartingPos(seed),
                 BaseStartingTemperature = float.Parse(StartingTemperature.Text),
                 MinimalTemperature = float.Parse(MinimalTemperature.Text),
-                TryStrategy = new RandomTryStrategy(seed),
+                TryStrategy = GetTryStrategy(seed),
                 BaseEquilibriumSteps = int.Parse(BaseEquilibriumSteps.Text),
                 MaxRejectedRatio = float.Parse(MaxUnaccepted.Text),
                 PenaltyMultiplier = float.Parse(PenaltyMultiplier.Text),
-                SavePlotInfo = true
+                SavePlotInfo = savePlotInfo
             };
 
             return annealingOptions;
@@ -115,13 +122,19 @@ namespace AnnealingKnapsackWPF
             }
         }
         
-        private IStartingPositionStrategy GetStartingPositionStrategy(int seed)
+        private TryStrategy GetTryStrategy(int seed)
         {
-            var selectedIndex = StartingPosition.SelectedIndex;
+            var selectedIndex = TryStrategy.SelectedIndex;
             switch (selectedIndex)
             {
                 case 0:
-                    return new RandomStartingPos(seed);
+                    return new RandomTryStrategy(seed);
+                case 1:
+                    return new ImproveTryStrategy(seed, 
+                        double.Parse(RandomNeighborProb.Text), 
+                        double.Parse(RandomNewProb.Text), 
+                        double.Parse(ImproveScoreProb.Text), 
+                        double.Parse(ImproveSatisProb.Text));
                 default:
                     return null;
             }
@@ -141,25 +154,42 @@ namespace AnnealingKnapsackWPF
             }
         }
 
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        private IScoreStrategy GetScoreStrategy()
         {
-            
-            var instances = InputReader.ReadSatInstances(InputFile.Text);
-            IList<SatInstance> instancesToSolve;
+            var selectedIndex = ScoreStrategy.SelectedIndex;
+            switch (selectedIndex)
+            {
+                case 0:
+                    return new SoftPenaltyScoreStrategy();
+                case 1:
+                    return new HardPenaltyScoreStrategy();
+                default:
+                    return null;
+            }
+        }
+
+        private async void SolveAndPlotClick(object sender, RoutedEventArgs e)
+        {
+            var instances = GetInstances();
+
             if ((bool)RandomInstance.IsChecked)
             {
                 Random random = new Random();
-                instancesToSolve = new List<SatInstance>();
-                instancesToSolve.Add(instances.ElementAt(random.Next(instances.Count)));
+                instances = new List<SatInstance> { instances.ElementAt(random.Next(instances.Count)) };
             }
             else
             {
-                instancesToSolve = instances;
+                instances = instances.Take(int.Parse(NumberOfInstances.Text)).ToList();
             }
 
-            var results = await SolveInstances(instancesToSolve, true);
+            var results = await SolveInstances(instances, true);
+            WriteDetailedResultInformation(results);
+        }
 
-            MyPlot.Model.Series.Clear();
+        private void WriteDetailedResultInformation(IList<SatResult> results)
+        {
+            if((bool) AutoClear.IsChecked)
+                AnnealingPlot.Model.Series.Clear();
             var solutionInfoBuilder = new StringBuilder();
             foreach (var result in results)
             {
@@ -167,31 +197,69 @@ namespace AnnealingKnapsackWPF
                 solutionInfoBuilder.AppendLine($"Epsilon: {result.Epsilon}");
                 solutionInfoBuilder.AppendLine($"Time [ms]: {result.RunTimeMs}");
                 solutionInfoBuilder.AppendLine($"Actual optimalization value: {result.Configuration.GetOptimalizationValue()}");
-                solutionInfoBuilder.AppendLine($"Optimal price: {result.OptimalConfiguration.GetOptimalizationValue()}");
+                solutionInfoBuilder.AppendLine($"Number of unsatisfied clauses: {result.Configuration.NumberOfUnsatisfiedClauses()}");
                 solutionInfoBuilder.AppendLine($"Actual vector: {string.Join(",", result.Configuration.Valuations.Select(i => i ? 1 : 0))}");
-                solutionInfoBuilder.AppendLine($"Solution vector: {string.Join(",", result.OptimalConfiguration.Valuations.Select(i => i ? 1 : 0))}");
+                if (result.OptimalConfiguration != null)
+                {
+                    solutionInfoBuilder.AppendLine($"Optimal price: {result.OptimalConfiguration.OptimalizationValue}");
+                    solutionInfoBuilder.AppendLine($"Solution vector: {string.Join(",", result.OptimalConfiguration.Valuations.Select(i => i ? 1 : 0))}");
+                }
                 var series = new LineSeries
                 {
                     ItemsSource = result.MovesHistory
                 };
-                MyPlot.Model.Series.Add(series);
+                AnnealingPlot.Model.Series.Add(series);
             }
 
-            MyPlot.Model.DefaultXAxis.Title = "Number of steps";
-            MyPlot.Model.DefaultYAxis.Title = "Value of optimalization criterion";
+            AnnealingPlot.Model.DefaultXAxis.Title = "Number of steps";
+            AnnealingPlot.Model.DefaultYAxis.Title = "Value of optimalization criterion";
             SolutionInfo.Text = solutionInfoBuilder.ToString();
-            MyPlot.InvalidatePlot();
-
+            AnnealingPlot.InvalidatePlot();
         }
 
         private void BrowseOutputFile_Click(object sender, RoutedEventArgs e)
         {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = InputFile.Text;
+            dialog.IsFolderPicker = true;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                OutputFolder.Text = dialog.FileName;
+            }
+        }
+
+        private float GetEpsilonOfSolution(int resultPrice, int optimalPrice)
+        {
+            if (Math.Max(resultPrice, optimalPrice) == 0)
+                return 0;
+            else
+                return (float)Math.Abs(resultPrice - optimalPrice) / Math.Max(resultPrice, optimalPrice);
+        }
+
+        private void AddEpsilonValues(IList<SatResult> results)
+        {
+            var referenceConfigurations = GetReferenceConfigurations();
+            foreach (var result in results)
+            {
+
+                if (referenceConfigurations.TryGetValue(result.SatInstance.Id, out var optimalConfiguration))
+                {
+                    result.Epsilon = GetEpsilonOfSolution(result.Configuration.GetOptimalizationValue(), optimalConfiguration.OptimalizationValue);
+                    result.OptimalConfiguration = optimalConfiguration;
+                }
+                else
+                {
+                    result.Epsilon = 0;
+                    Debug.WriteLine($"Warning: no reference for id: {result.SatInstance.Id}");
+                }
+            }
         }
 
         private async Task<IList<SatResult>> SolveInstances(IList<SatInstance> instances, bool savePlotInfo)
         {
-            var options = GetOptions();
-            options.SavePlotInfo = savePlotInfo;
+            var options = GetOptions(savePlotInfo);
+            
 
             numberOfInstancesTotal = int.Parse(NumberOfInstances.Text);
             var instanceOffset = int.Parse(InstanceOffset.Text);
@@ -201,30 +269,62 @@ namespace AnnealingKnapsackWPF
             {
                 var performanceTester = new PerformanceTester();
                 performanceTester.RaiseInstanceCalculationFinished += OnInstanceCalculationFinished;
-                return performanceTester.SolveWithPerformanceTest(instances.Skip(instanceOffset).Take(numberOfInstancesTotal).ToList(), options);
+                var res = performanceTester.SolveWithPerformanceTest(instances.Skip(instanceOffset).Take(numberOfInstancesTotal).ToList(), options);
+                return res;
             }
             );
-            ProgressLabel.Content = "Calculations done!";
 
+            foreach(var result in results)
+            {
+                result.ResultLabel = CustomRowLabel.Text;
+            }
+
+            if ((bool)ReferenceFileCheckbox.IsChecked)
+                AddEpsilonValues(results);
+            ProgressLabel.Content = "Calculations done!";
             return results;
         }
 
         private async void SolveAndOutput_Click(object sender, RoutedEventArgs e)
         {
-            var instances = InputReader.ReadSatInstances(InputFile.Text).Take(int.Parse(NumberOfInstances.Text)).ToList();
+            var instances = GetInstances().Take(int.Parse(NumberOfInstances.Text)).ToList();
             var results = await SolveInstances(instances, false);
 
             var solutionInfoBuilder = new StringBuilder();
             solutionInfoBuilder.AppendLine($"Min epsilon: {results.Select(r => r.Epsilon).Min()}");
-            solutionInfoBuilder.AppendLine($"Avg epsilon: {results.Select(r => r.Epsilon).Average()}");
+            solutionInfoBuilder.AppendLine($"Avg epsilon: {results.Select(r => r.Epsilon).Average().ToString("F10")}");
             solutionInfoBuilder.AppendLine($"Max epsilon: {results.Select(r => r.Epsilon).Max()}");
             solutionInfoBuilder.AppendLine($"Min runtime: {results.Select(r => r.RunTimeMs).Min()}");
             solutionInfoBuilder.AppendLine($"Avg runtime: {results.Select(r => r.RunTimeMs).Average()}");
             solutionInfoBuilder.AppendLine($"Max runtime: {results.Select(r => r.RunTimeMs).Max()}");
+            solutionInfoBuilder.AppendLine($"Number of unsatisfied: {results.Aggregate(0,(acc, res) => res.Configuration.IsSatisfiable() ? acc: acc+1)}");
             SolutionInfo.Text = solutionInfoBuilder.ToString();
 
             var outputLocation = System.IO.Path.Join(OutputFolder.Text, OutputFileName.Text);
-            //OutputWriter.WriteAllResults(results, outputLocation);
+            OutputWriter.WriteAllResults(results, outputLocation);
+        }
+
+        //Method used to lazy-load the instances
+        private IList<SatInstance> GetInstances()
+        {
+            //Load a new list if not loaded or not up to date
+            if(loadedInstanceLocation == null || loadedInstanceLocation != InputFile.Text)
+            {
+                loadedInstances = InputReader.ReadSatInstances(InputFile.Text).ToList();
+                loadedInstanceLocation = InputFile.Text;
+            }
+            return loadedInstances;
+        }
+
+        private IDictionary<int, ReferenceConfiguration> GetReferenceConfigurations()
+        {
+            //Load a new list if not loaded or not up to date
+            if (loadedReferenceConfigurationsLocation == null || loadedReferenceConfigurationsLocation != ReferenceFile.Text)
+            {
+                loadedReferenceConfigurations = InputReader.ReadOptimalConfigurations(ReferenceFile.Text);
+                loadedReferenceConfigurationsLocation = ReferenceFile.Text;
+            }
+            return loadedReferenceConfigurations;
         }
 
         private void MyPlot_Initialized(object sender, EventArgs e)
@@ -232,5 +332,10 @@ namespace AnnealingKnapsackWPF
 
         }
 
+        private void ReferenceFileCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            ReferenceFile.IsEnabled = (bool) ReferenceFileCheckbox.IsChecked;
+            ReferenceFileBrowseButton.IsEnabled = (bool)ReferenceFileCheckbox.IsChecked;
+        }
     }
 }

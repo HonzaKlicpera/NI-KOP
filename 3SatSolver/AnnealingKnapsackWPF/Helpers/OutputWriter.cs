@@ -11,17 +11,18 @@ using System.Text;
 
 namespace AnnealingWPF.Helpers
 {
-    /*
-    public sealed class ConstructiveResultMap: ClassMap<KnapsackResult>
+    
+    public sealed class ResultMap: ClassMap<SatResult>
     {
-        public ConstructiveResultMap()
+        public ResultMap()
         {
-            Map(m => m.KnapsackInstance.Id).Name("ID");
+            Map(m => m.SatInstance.Id).Name("ID");
             Map(m => m.RunTimeMs).Name("Average Runtime [ms]");
-            Map(m => m.Configuration.ItemVector).TypeConverter<ItemVectorConverter>().Name("Result vector");
-            Map(m => m.KnapsackInstance.Items.Count).Name("n");
+            Map(m => m.Configuration.Valuations).TypeConverter<ItemVectorConverter>().Name("Result vector");
+            Map(m => m.SatInstance.Literals.Count).Name("n");
             Map(m => m.Epsilon).Name("Epsilon");
-            Map(m => m.WatchedParameter).Name("Watched Parameter");
+            Map(m => m.NumberOfUnsatisfiedClauses).Name("Number of unsatisfied clauses");
+            Map(m => m.ResultLabel).Name("Result Label");
         }
     }
 
@@ -36,7 +37,7 @@ namespace AnnealingWPF.Helpers
     public static class OutputWriter
     {
 
-        public static void WriteAllResults(IList<KnapsackResult> results, string location)
+        public static void WriteAllResults(IList<SatResult> results, string location)
         {
             bool fileExists = File.Exists(location);
 
@@ -45,7 +46,7 @@ namespace AnnealingWPF.Helpers
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 // Don't write the header if file already existed.
-                csv.Configuration.RegisterClassMap<ConstructiveResultMap>();
+                csv.Configuration.RegisterClassMap<ResultMap>();
                 csv.Configuration.HasHeaderRecord = !fileExists;
                 csv.WriteRecords(results);
                 csv.Flush();
@@ -64,5 +65,5 @@ namespace AnnealingWPF.Helpers
             return acc;
         }
     }
-    */
+    
 }

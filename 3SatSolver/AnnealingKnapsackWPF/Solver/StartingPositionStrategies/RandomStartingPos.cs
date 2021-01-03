@@ -18,12 +18,7 @@ namespace AnnealingKnapsackWPF.Solver.StartingPositionStrategies
 
         public SatConfiguration GetStartingPosition(SimulatedAnnealingSolver solverInstance)
         {
-            var configuration = new SatConfiguration {Instance = solverInstance.Instance};
-            foreach(var item in solverInstance.Instance.Literals)
-            {
-                configuration.Valuations.Add(Convert.ToBoolean(random.Next(0, 1)));
-            }
-            return configuration;
+            return SatConfiguration.RandomConfiguration(solverInstance.SatInstance, random);
         }
     }
 }

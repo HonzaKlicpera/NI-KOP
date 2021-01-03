@@ -49,7 +49,7 @@ namespace AnnealingWPF.Helpers
         public static SatClause ParseSatClause(string line, IList<SatLiteral> literals, int clauseLength = 0)
         {
             var splitLine = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-
+                
             if (clauseLength > 0 && splitLine.Length - 1 != clauseLength)
                 throw new InvalidInputFormatException("Invalid number of literals in a clause");
             if (!int.TryParse(splitLine.Last(), out int result) || result != 0)
@@ -60,7 +60,7 @@ namespace AnnealingWPF.Helpers
             foreach (var literalId in splitLine.Take(splitLine.Length - 1))
             {
                 if (int.TryParse(literalId, out int parsedId))
-                    ratedLiterals.Add(new SatRatedLiteral(parsedId < 0, literals[Math.Abs(parsedId)]));
+                    ratedLiterals.Add(new SatRatedLiteral(parsedId < 0, literals[Math.Abs(parsedId)-1]));
                 else
                     throw new InvalidArgumentException("Could not parse literal id in a clause");
             }
@@ -71,10 +71,13 @@ namespace AnnealingWPF.Helpers
         {
             var splitLine = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
 
-            if (splitLine.Length - 1 != expectedLiteralCount)
+            if (splitLine.Length - 2 != expectedLiteralCount)
                 throw new InvalidInputFormatException("Number of expected literals does not match number of weight parameters");
+            var test = splitLine.Skip(1)
+                .SkipLast(1).ToList();
 
             return splitLine.Skip(1)
+                .SkipLast(1)
                 .Select((weight, index) => new SatLiteral(index+1, int.Parse(weight)))
                 .ToList();
         }

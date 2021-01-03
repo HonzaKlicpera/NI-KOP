@@ -8,7 +8,10 @@ namespace AnnealingWPF.Solver
 {
     public class SimulatedAnnealingSolver
     {
-        public SatInstance Instance { get; private set; }
+        public const int MAX_RESTART_COUNT = 3;
+        public const float EQUILIBRIUM_RESTART_MULTIPLIER = 1.2f;
+
+        public SatInstance SatInstance { get; private set; }
         public AnnealingOptions Options { get; private set; }
         public ulong NumberOfSteps;
 
@@ -19,29 +22,52 @@ namespace AnnealingWPF.Solver
         public SatConfiguration BestConfiguration { get; private set; }
         private SatConfiguration currentConfiguration;
 
+        private IList<DataPoint> movesHistory;
+
 
         public SimulatedAnnealingSolver(SatInstance instance, AnnealingOptions options)
         {
-            Instance = instance;
+            SatInstance = instance;
             Options = options;
             NumberOfSteps = 0;
         }
 
         public SatResult Solve()
         {
-            var movesHistory = new List<DataPoint>();
+            movesHistory = new List<DataPoint>();
             currentConfiguration = Options.StartingPositionStrategy.GetStartingPosition(this);
-            BestConfiguration = currentConfiguration;
+            BestConfiguration = new SatConfiguration { Instance = SatInstance, Score = 0, Valuations = new List<bool>(new bool[SatInstance.Literals.Count])};
             CurrentTemperature = Options.BaseStartingTemperature;
+
+            var solutionLoopCount = 0;
+            while (!RunSolutionLoop() && solutionLoopCount < MAX_RESTART_COUNT - 1)
+            {
+                solutionLoopCount++;
+                CurrentTemperature = Options.BaseStartingTemperature;
+                //Options.BaseEquilibriumSteps = (int) (Options.BaseEquilibriumSteps * EQUILIBRIUM_RESTART_MULTIPLIER);
+            }
+
+            
+            return new SatResult { Configuration = BestConfiguration,
+                SatInstance = SatInstance,
+                NumberOfSteps = NumberOfSteps,
+                MovesHistory = movesHistory,
+                NumberOfUnsatisfiedClauses = BestConfiguration.NumberOfUnsatisfiedClauses()
+            };
+        }
+
+        private bool RunSolutionLoop()
+        {
             while (!Options.FrozenStrategy.Frozen(this))
             {
                 AcceptedDuringEquilibrium = 0;
                 EquilibriumSteps = 0;
 
-                while(Options.EquilibriumStrategy.Equilibrium(this))
+                while (Options.EquilibriumStrategy.Equilibrium(this))
                 {
                     EquilibriumSteps++;
-                    movesHistory.Add(new DataPoint((int) NumberOfSteps + EquilibriumSteps, currentConfiguration.GetOptimalizationValue()));
+                    if(Options.SavePlotInfo)
+                        movesHistory.Add(new DataPoint((int)NumberOfSteps + EquilibriumSteps, currentConfiguration.GetOptimalizationValue()));
                     //Try to accept a new state
                     if (Options.TryStrategy.Try(this, ref currentConfiguration))
                         AcceptedDuringEquilibrium++;
@@ -50,12 +76,12 @@ namespace AnnealingWPF.Solver
                         BestConfiguration = currentConfiguration;
                 }
                 CurrentTemperature = Options.CoolStrategy.Cool(this);
-                NumberOfSteps += (ulong) EquilibriumSteps;
+                NumberOfSteps += (ulong)EquilibriumSteps;
             }
-            return new SatResult { Configuration = BestConfiguration,
-                SatInstance = Instance,
-                NumberOfSteps = NumberOfSteps,
-                MovesHistory = movesHistory};
+
+            if (BestConfiguration.IsSatisfiable())
+                return true;
+            return false;
         }
     }
 }

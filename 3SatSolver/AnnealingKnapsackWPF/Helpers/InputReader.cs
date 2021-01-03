@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
 
 namespace AnnealingWPF.Helpers
 {
@@ -31,11 +32,17 @@ namespace AnnealingWPF.Helpers
                 while ((ln = file.ReadLine()) != null)
                 {
                     var trimmedLn = ln.Trim();
-                    var configuration = InputFieldParser.ParseOptimalConfiguration(trimmedLn);
-                    optimalConfigurations.Add(configuration.InstanceId, configuration);
+                    if (trimmedLn != "")
+                    {
+                        var configuration = InputFieldParser.ParseOptimalConfiguration(trimmedLn);
+                        optimalConfigurations.TryAdd(configuration.InstanceId, configuration);
+                    }
 
                 }
             }
+            if (optimalConfigurations.Count == 0)
+                throw new InvalidInputFormatException("The reference solution file does not contain any valid values");
+
             return optimalConfigurations;
         }
 
@@ -62,12 +69,14 @@ namespace AnnealingWPF.Helpers
                         instance.Literals = InputFieldParser.ParseLiteralWeights(trimmedLn, numberOfLiterals);
                     else if (trimmedLn.StartsWith('c'))
                         continue;
+                    else if (trimmedLn.StartsWith('%'))
+                        break;
                     else
-                        InputFieldParser.ParseSatClause(trimmedLn, instance.Literals, InputFieldParser.CLAUSE_LENGTH);
+                       clauses.Add(InputFieldParser.ParseSatClause(trimmedLn, instance.Literals, InputFieldParser.CLAUSE_LENGTH));
                 }
 
                 if (clauses.Count != numberOfClauses)
-                    throw new InvalidInputFormatException("Number of expected clauses does not match the actual amount");
+                    Debug.WriteLine($"Warning: Number of expected clauses({numberOfClauses}) does not match the actual amount({clauses.Count}) - {fileName}");
                 instance.Clauses = clauses;
             }
             return instance;

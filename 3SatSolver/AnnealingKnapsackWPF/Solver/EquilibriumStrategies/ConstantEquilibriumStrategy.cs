@@ -8,7 +8,7 @@ namespace AnnealingWPF.Solver.EquilibriumStrategies
     {
         public override bool Equilibrium(SimulatedAnnealingSolver solverInstance)
         {
-            if (loopCount >= solverInstance.Options.BaseEquilibriumSteps * solverInstance.Instance.Literals.Count)
+            if (loopCount >= solverInstance.Options.BaseEquilibriumSteps * solverInstance.SatInstance.Literals.Count)
             {
                 loopCount = 0;
                 return false;
