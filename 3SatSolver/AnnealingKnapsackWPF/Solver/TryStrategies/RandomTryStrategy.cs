@@ -20,7 +20,7 @@ namespace AnnealingWPF.Solver.TryStrategies
             
             triedConfiguration.Score = solverInstance.Options.ScoreStrategy.CalculateScore(triedConfiguration, solverInstance);
 
-            if(Accept(triedConfiguration, currentConfiguration, solverInstance))
+            if(Accept(triedConfiguration, currentConfiguration, solverInstance.CurrentTemperature))
             {
                 currentConfiguration = triedConfiguration;
                 return true;

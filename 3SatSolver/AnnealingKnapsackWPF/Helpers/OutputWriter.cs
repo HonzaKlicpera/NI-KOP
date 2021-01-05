@@ -18,10 +18,13 @@ namespace AnnealingWPF.Helpers
         {
             Map(m => m.SatInstance.Id).Name("ID");
             Map(m => m.RunTimeMs).Name("Average Runtime [ms]");
+            Map(m => m.RestartCount).Name("Restart count");
+            Map(m => m.NumberOfSteps).Name("Number of steps");
             Map(m => m.Configuration.Valuations).TypeConverter<ItemVectorConverter>().Name("Result vector");
             Map(m => m.SatInstance.Literals.Count).Name("n");
             Map(m => m.Epsilon).Name("Epsilon");
             Map(m => m.NumberOfUnsatisfiedClauses).Name("Number of unsatisfied clauses");
+            Map(m => m.BestConfigurationFoundAt).Name("Best configuration found at");
             Map(m => m.ResultLabel).Name("Result Label");
         }
     }

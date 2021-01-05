@@ -16,7 +16,7 @@ namespace AnnealingWPF.Helpers
         public delegate void InstanceCalculationFinished();
         public  event InstanceCalculationFinished RaiseInstanceCalculationFinished;
 
-        public static int REPEAT_COUNT = 1;
+        public static int REPEAT_COUNT = 5;
 
         private void PreparePerformanceTest(IList<SatInstance> instances)
         {

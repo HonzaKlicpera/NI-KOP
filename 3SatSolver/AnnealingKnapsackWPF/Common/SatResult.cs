@@ -19,7 +19,9 @@ namespace AnnealingWPF.Common
 
         public ulong NumberOfSteps { get; set; }
         public double RunTimeMs { get; set; }
+        public int RestartCount { get; set; }
         public double Epsilon { get; set; }
         public int NumberOfUnsatisfiedClauses { get; set; }
+        public ulong BestConfigurationFoundAt;
     }
 }

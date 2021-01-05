@@ -16,16 +16,15 @@ namespace AnnealingWPF.Solver.TryStrategies
 
         public abstract bool Try(SimulatedAnnealingSolver solverInstance, ref SatConfiguration currentConfiguration);
 
-        protected bool Accept(SatConfiguration triedConfiguration, SatConfiguration currentConfiguration, SimulatedAnnealingSolver solverInstance)
+        protected bool Accept(SatConfiguration triedConfiguration, SatConfiguration currentConfiguration, float currentTemperature)
         {
             //Tried configuration is better
             if (triedConfiguration.Score >= currentConfiguration.Score)
                 return true;
 
             var delta = triedConfiguration.Score - currentConfiguration.Score;
-            var scaledTemperature = solverInstance.CurrentTemperature * currentConfiguration.Instance.GetSumOfWeights();
             //The configuration is not better, but will be accepted under the given probability
-            if (random.NextDouble() < Math.Exp(delta / scaledTemperature))
+            if (random.NextDouble() < Math.Exp(delta / currentTemperature))
                 return true;
             return false;
         }

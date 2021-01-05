@@ -41,7 +41,7 @@ namespace AnnealingKnapsackWPF
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void OnInstanceCalculationFinished()
@@ -59,7 +59,7 @@ namespace AnnealingKnapsackWPF
             dialog.InitialDirectory = InputFile.Text;
             dialog.IsFolderPicker = true;
 
-            if(dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 InputFile.Text = dialog.FileName;
             }
@@ -78,7 +78,7 @@ namespace AnnealingKnapsackWPF
 
         private AnnealingOptions GetOptions(bool savePlotInfo)
         {
-            
+
             int seed;
             if ((bool)RandomSeed.IsChecked)
             {
@@ -87,7 +87,7 @@ namespace AnnealingKnapsackWPF
             }
             else
                 seed = 5;
-                
+
             var annealingOptions = new AnnealingOptions
             {
                 CoolingCoefficient = float.Parse(CoolingCoefficient.Text),
@@ -121,7 +121,7 @@ namespace AnnealingKnapsackWPF
                     return null;
             }
         }
-        
+
         private TryStrategy GetTryStrategy(int seed)
         {
             var selectedIndex = TryStrategy.SelectedIndex;
@@ -130,10 +130,10 @@ namespace AnnealingKnapsackWPF
                 case 0:
                     return new RandomTryStrategy(seed);
                 case 1:
-                    return new ImproveTryStrategy(seed, 
-                        double.Parse(RandomNeighborProb.Text), 
-                        double.Parse(RandomNewProb.Text), 
-                        double.Parse(ImproveScoreProb.Text), 
+                    return new ImproveTryStrategy(seed,
+                        double.Parse(RandomNeighborProb.Text),
+                        double.Parse(RandomNewProb.Text),
+                        double.Parse(ImproveScoreProb.Text),
                         double.Parse(ImproveSatisProb.Text));
                 default:
                     return null;
@@ -163,6 +163,8 @@ namespace AnnealingKnapsackWPF
                     return new SoftPenaltyScoreStrategy();
                 case 1:
                     return new HardPenaltyScoreStrategy();
+                case 2:
+                    return new SoftScaledPenaltyScoreStrategy();
                 default:
                     return null;
             }
@@ -179,7 +181,9 @@ namespace AnnealingKnapsackWPF
             }
             else
             {
-                instances = instances.Take(int.Parse(NumberOfInstances.Text)).ToList();
+                instances = instances.Skip(int.Parse(InstanceOffset.Text))
+                    .Take(int.Parse(NumberOfInstances.Text))
+                    .ToList();
             }
 
             var results = await SolveInstances(instances, true);
@@ -188,7 +192,7 @@ namespace AnnealingKnapsackWPF
 
         private void WriteDetailedResultInformation(IList<SatResult> results)
         {
-            if((bool) AutoClear.IsChecked)
+            if ((bool)AutoClear.IsChecked)
                 AnnealingPlot.Model.Series.Clear();
             var solutionInfoBuilder = new StringBuilder();
             foreach (var result in results)
@@ -242,7 +246,6 @@ namespace AnnealingKnapsackWPF
             var referenceConfigurations = GetReferenceConfigurations();
             foreach (var result in results)
             {
-
                 if (referenceConfigurations.TryGetValue(result.SatInstance.Id, out var optimalConfiguration))
                 {
                     result.Epsilon = GetEpsilonOfSolution(result.Configuration.GetOptimalizationValue(), optimalConfiguration.OptimalizationValue);
@@ -250,7 +253,7 @@ namespace AnnealingKnapsackWPF
                 }
                 else
                 {
-                    result.Epsilon = 0;
+                    result.Epsilon = result.Configuration.NumberOfUnsatisfiedClauses() / (double)result.Configuration.Instance.Clauses.Count;
                     Debug.WriteLine($"Warning: no reference for id: {result.SatInstance.Id}");
                 }
             }
@@ -259,45 +262,45 @@ namespace AnnealingKnapsackWPF
         private async Task<IList<SatResult>> SolveInstances(IList<SatInstance> instances, bool savePlotInfo)
         {
             var options = GetOptions(savePlotInfo);
-            
 
-            numberOfInstancesTotal = int.Parse(NumberOfInstances.Text);
-            var instanceOffset = int.Parse(InstanceOffset.Text);
+            numberOfInstancesTotal = instances.Count;
             numberOfFinishedInstances = 0;
 
             var results = await Task.Factory.StartNew(() =>
             {
                 var performanceTester = new PerformanceTester();
                 performanceTester.RaiseInstanceCalculationFinished += OnInstanceCalculationFinished;
-                var res = performanceTester.SolveWithPerformanceTest(instances.Skip(instanceOffset).Take(numberOfInstancesTotal).ToList(), options);
+                var res = performanceTester.SolveWithPerformanceTest(instances, options);
                 return res;
             }
             );
 
-            foreach(var result in results)
+            foreach (var result in results)
             {
                 result.ResultLabel = CustomRowLabel.Text;
             }
 
-            if ((bool)ReferenceFileCheckbox.IsChecked)
-                AddEpsilonValues(results);
+            AddEpsilonValues(results);
+
             ProgressLabel.Content = "Calculations done!";
             return results;
         }
 
         private async void SolveAndOutput_Click(object sender, RoutedEventArgs e)
         {
-            var instances = GetInstances().Take(int.Parse(NumberOfInstances.Text)).ToList();
+            var instances = GetInstances().Skip(int.Parse(InstanceOffset.Text))
+                .Take(int.Parse(NumberOfInstances.Text))
+                .ToList();
             var results = await SolveInstances(instances, false);
 
             var solutionInfoBuilder = new StringBuilder();
             solutionInfoBuilder.AppendLine($"Min epsilon: {results.Select(r => r.Epsilon).Min()}");
-            solutionInfoBuilder.AppendLine($"Avg epsilon: {results.Select(r => r.Epsilon).Average().ToString("F10")}");
+            solutionInfoBuilder.AppendLine($"Avg epsilon: {results.Select(r => r.Epsilon).Average()}");
             solutionInfoBuilder.AppendLine($"Max epsilon: {results.Select(r => r.Epsilon).Max()}");
             solutionInfoBuilder.AppendLine($"Min runtime: {results.Select(r => r.RunTimeMs).Min()}");
             solutionInfoBuilder.AppendLine($"Avg runtime: {results.Select(r => r.RunTimeMs).Average()}");
             solutionInfoBuilder.AppendLine($"Max runtime: {results.Select(r => r.RunTimeMs).Max()}");
-            solutionInfoBuilder.AppendLine($"Number of unsatisfied: {results.Aggregate(0,(acc, res) => res.Configuration.IsSatisfiable() ? acc: acc+1)}");
+            solutionInfoBuilder.AppendLine($"Number of unsatisfied: {results.Aggregate(0, (acc, res) => res.Configuration.IsSatisfiable() ? acc : acc + 1)}");
             SolutionInfo.Text = solutionInfoBuilder.ToString();
 
             var outputLocation = System.IO.Path.Join(OutputFolder.Text, OutputFileName.Text);
@@ -308,7 +311,7 @@ namespace AnnealingKnapsackWPF
         private IList<SatInstance> GetInstances()
         {
             //Load a new list if not loaded or not up to date
-            if(loadedInstanceLocation == null || loadedInstanceLocation != InputFile.Text)
+            if (loadedInstanceLocation == null || loadedInstanceLocation != InputFile.Text)
             {
                 loadedInstances = InputReader.ReadSatInstances(InputFile.Text).ToList();
                 loadedInstanceLocation = InputFile.Text;
@@ -318,6 +321,9 @@ namespace AnnealingKnapsackWPF
 
         private IDictionary<int, ReferenceConfiguration> GetReferenceConfigurations()
         {
+            if (!(bool)ReferenceFileCheckbox.IsChecked)
+                return new Dictionary<int, ReferenceConfiguration>();
+
             //Load a new list if not loaded or not up to date
             if (loadedReferenceConfigurationsLocation == null || loadedReferenceConfigurationsLocation != ReferenceFile.Text)
             {
@@ -334,7 +340,7 @@ namespace AnnealingKnapsackWPF
 
         private void ReferenceFileCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            ReferenceFile.IsEnabled = (bool) ReferenceFileCheckbox.IsChecked;
+            ReferenceFile.IsEnabled = (bool)ReferenceFileCheckbox.IsChecked;
             ReferenceFileBrowseButton.IsEnabled = (bool)ReferenceFileCheckbox.IsChecked;
         }
     }

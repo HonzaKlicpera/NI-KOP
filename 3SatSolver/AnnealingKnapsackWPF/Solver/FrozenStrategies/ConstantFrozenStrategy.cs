@@ -8,7 +8,7 @@ namespace AnnealingWPF.Solver.FrozenStrategies
     {
         public bool Frozen(SimulatedAnnealingSolver solverInstance)
         {
-            if (solverInstance.CurrentTemperature <= solverInstance.Options.MinimalTemperature)
+            if (solverInstance.CurrentTemperature <= solverInstance.ScaledMinTemperature)
                 return true;
             return false;
         }

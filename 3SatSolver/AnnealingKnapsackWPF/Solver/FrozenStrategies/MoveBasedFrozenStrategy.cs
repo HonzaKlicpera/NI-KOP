@@ -14,7 +14,7 @@ namespace AnnealingWPF.Solver.FrozenStrategies
             else
                 rejectedRatio = 1.0f - ((float)solverInstance.AcceptedDuringEquilibrium / solverInstance.EquilibriumSteps);
 
-            if (solverInstance.CurrentTemperature <= solverInstance.Options.MinimalTemperature
+            if (solverInstance.CurrentTemperature <= solverInstance.ScaledMinTemperature
                 || rejectedRatio >= solverInstance.Options.MaxRejectedRatio)
                 return true;
             return false;
