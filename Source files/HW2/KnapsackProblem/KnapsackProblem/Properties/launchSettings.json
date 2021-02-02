@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KnapsackProblem": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK4_inst.dat -p constructive -t C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\NK\\\\NK4_sol.dat -s fptas --aprAccuracy 0.5 -o C:\\\\Users\\\\Johny\\\\source\\\\repos\\\\NI-KOP\\\\ReferenceData\\\\HW2\\\\testttt.csv"
+    }
+  }
+}
